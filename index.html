@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blog Posting Pipeline — Demo</title>
+  <meta name="description" content="A fabricated, scripted walkthrough of the 7-step blog posting pipeline's architecture. No live API calls, no real client data.">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="demo-banner">
+    <strong>Demo mode</strong> — fabricated example run for illustration. No live API calls happen here; nothing shown is a real client's data.
+  </div>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="kicker">blog-posting-pipeline / demo</p>
+      <h1>Blog Posting Pipeline</h1>
+      <p class="lede">
+        The real system is a production 7-step AI content pipeline that researches,
+        writes, illustrates, and publishes SEO/AEO blog posts for real Digitalise
+        Agency clients. Its source is private, since the pipeline itself is the
+        agency's live product. This page replays one fabricated example run,
+        step by step, against an invented brand ("Nordkast Coffee Supply") so the
+        architecture can be seen working without exposing any real client.
+      </p>
+      <div class="controls">
+        <button class="btn btn--primary" id="run-btn">Run the pipeline</button>
+        <button class="btn btn--ghost" id="reset-btn" style="display:none">Reset</button>
+      </div>
+      <div class="rail" id="rail"></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="steps"></div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      This is a companion demo for a private repository. It contains no real client
+      data and makes no live API calls; every output on this page is pre-scripted.
+    </div>
+  </footer>
+
+  <script src="demo-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
