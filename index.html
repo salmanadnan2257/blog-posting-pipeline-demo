@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="demo-banner">
-    <strong>Demo mode</strong> — fabricated example run for illustration. No live API calls happen here; nothing shown is a real client's data.
+    <strong>Demo mode</strong> — fabricated example runs for illustration. No live API calls happen here; nothing shown is a real client's data.
   </div>
 
   <nav class="demo-nav">
@@ -32,21 +32,51 @@
       <p class="lede">
         The real system is a production 7-step AI content pipeline that researches,
         writes, illustrates, and publishes SEO/AEO blog posts for real Digitalise
-        Agency clients. Its source is private, since the pipeline itself is the
-        agency's live product. This page replays one fabricated example run,
-        step by step, against an invented brand ("Nordkast Coffee Supply") so the
-        architecture can be seen working without exposing any real client.
+        Agency clients, including davonex.com. Its source is private, since the
+        pipeline itself is the agency's live product. This page replays fabricated
+        example runs, step by step, against an invented brand ("Nordkast Coffee
+        Supply") so the architecture can be seen working without exposing any real
+        client's actual generation.
       </p>
-      <div class="controls">
-        <button class="btn btn--primary" id="run-btn">Run the pipeline <span class="arr">&#8594;</span></button>
-        <button class="btn btn--ghost" id="reset-btn" style="display:none">Reset</button>
+
+      <div class="tabs">
+        <button class="tab is-active" data-tab="pipeline">Run the pipeline</button>
+        <button class="tab" data-tab="library">Blog Library <span id="library-tab-count"></span></button>
       </div>
-      <div class="rail" id="rail" style="margin-top:28px"></div>
     </div>
   </header>
 
   <main class="wrap">
-    <div id="steps"></div>
+
+    <section class="panel is-active" id="panel-pipeline">
+
+      <div class="brief-card">
+        <p class="section-label">1. Autofill the brief (pick an example)</p>
+        <div class="preset-row" id="preset-row"></div>
+        <div class="brief-preview" id="brief-preview"></div>
+        <div class="controls">
+          <button class="btn btn--primary" id="run-btn">Run the pipeline <span class="arr">&#8594;</span></button>
+          <button class="btn btn--ghost" id="reset-btn" style="display:none">Reset</button>
+        </div>
+        <div class="rail" id="rail" style="margin-top:22px"></div>
+      </div>
+
+      <div id="steps"></div>
+    </section>
+
+    <section class="panel" id="panel-library">
+      <p class="section-label" style="margin-top:0">Nordkast Coffee Supply / Blog</p>
+      <p class="library-intro">
+        This list mirrors davonex.com/blog: by default it shows the real, live posts
+        published there by the actual production pipeline (titles, excerpts, dates,
+        and read times copied verbatim; no image is fetched from davonex.com — see
+        the caption on each card). Run the pipeline on the other tab and a fabricated
+        demo post is added here for 15 minutes, clearly marked, then automatically
+        removed.
+      </p>
+      <div class="library-grid" id="library-grid"></div>
+    </section>
+
   </main>
 
   <footer class="site-foot">

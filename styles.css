@@ -155,6 +155,18 @@ header.hero { padding: 56px 0 32px; position: relative; }
 h1 { font-family: inherit; font-weight: 700; letter-spacing: -.02em; color: var(--navy); font-size: clamp(30px, 4.4vw, 44px); line-height: 1.06; margin: 0 0 14px; }
 .lede { font-size: 16px; color: var(--ink-soft); max-width: 660px; margin: 0 0 26px; }
 
+/* ============================ Tabs ============================ */
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tab {
+  border: 1px solid var(--line); background: var(--paper); border-radius: 999px;
+  padding: 10px 20px; font-weight: 700; font-size: 13.5px; cursor: pointer; color: var(--ink-soft);
+  box-shadow: var(--shadow-sm); transition: background .2s, color .2s, border-color .2s;
+}
+.tab.is-active { background: var(--navy); color: #fff; border-color: var(--navy); }
+.tab:not(.is-active):hover { border-color: var(--blue); color: var(--navy); }
+.panel { display: none; }
+.panel.is-active { display: block; }
+
 /* ============================ Progress rail ============================ */
 .rail { display: flex; gap: 6px; margin: 0 0 0; flex-wrap: wrap; }
 .rail__dot {
@@ -169,6 +181,40 @@ h1 { font-family: inherit; font-weight: 700; letter-spacing: -.02em; color: var(
 .rail__dot.is-done::after { content: " \2713"; }
 
 main { padding: 40px 0 80px; flex: 1 0 auto; width: 100%; }
+
+/* ============================ Brief autofill card ============================ */
+.brief-card {
+  border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--shadow-sm);
+  background: var(--paper); padding: 26px 28px; margin-bottom: 28px;
+}
+.section-label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 700; margin: 0 0 14px;
+}
+.preset-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+.preset-chip {
+  border: 1px solid var(--line-strong); background: var(--bg-alt); color: var(--ink-soft);
+  border-radius: 999px; padding: 9px 16px; font-weight: 700; font-size: 13px; cursor: pointer;
+  transition: background .2s, color .2s, border-color .2s;
+}
+.preset-chip:hover:not(:disabled) { border-color: var(--blue); color: var(--navy); }
+.preset-chip.is-active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.preset-chip:disabled { opacity: .55; cursor: not-allowed; }
+.entity-grid { display: grid; gap: 12px; }
+.entity { border: 1px solid var(--line); border-radius: var(--r-sm); padding: 12px 14px; background: var(--bg-alt); }
+.entity .k { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-soft); font-weight: 700; margin-bottom: 4px; }
+.entity .v { font-size: 14px; font-weight: 700; color: var(--navy); }
+.modeled-after { font-size: 12.5px; color: var(--ink-soft); margin-top: 14px; }
+.modeled-after a { color: var(--blue); font-weight: 600; }
+
+/* ============================ Real hero photo (replaces the old SVG placeholder) ============================ */
+.hero-photo { border-radius: var(--r-md); overflow: hidden; border: 1px solid var(--line); background: var(--bg-alt); }
+.hero-photo img { width: 100%; height: 280px; object-fit: cover; }
+.hero-photo__caption {
+  display: block; padding: 10px 14px; font-size: 12.5px; color: var(--ink-soft);
+  background: var(--paper); border-top: 1px solid var(--line);
+}
+.image-prompt { margin-top: 14px; font-style: italic; color: var(--ink-soft); font-size: 14px; }
 
 /* ============================ Step cards ============================ */
 .step {
@@ -213,14 +259,6 @@ main { padding: 40px 0 80px; flex: 1 0 auto; width: 100%; }
 .article .refs { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-soft); }
 .article .refs ol { padding-left: 20px; margin-top: 8px; }
 .article .refs li { margin-bottom: 6px; }
-
-.image-placeholder { border: 1px dashed var(--line-strong); border-radius: var(--r-md); padding: 32px; text-align: center; background: var(--bg-alt); }
-.image-placeholder svg { max-width: 220px; margin: 0 auto 12px; display: block; }
-.image-placeholder__caption {
-  font-size: 13px; color: var(--navy); font-weight: 600; background: var(--paper);
-  display: inline-block; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-strong);
-}
-.image-prompt { margin-top: 14px; font-style: italic; color: var(--ink-soft); font-size: 14px; }
 
 .publish-card { background: var(--bg-alt); border: 1px solid var(--line); border-radius: var(--r-md); padding: 16px; margin-bottom: 16px; }
 .publish-card__url { font-family: var(--mono); font-size: 14px; color: var(--blue-deep); }
@@ -288,6 +326,7 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
 .pv-meta-row .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-soft); opacity: .5; }
 
 .pv-figure { margin: 0 0 8px; }
+.pv-figure img { width: 100%; height: 260px; object-fit: cover; border-radius: var(--r-md); border: 1px solid var(--line); background: var(--bg-alt); }
 .pv-figure__caption { margin-top: 8px; font-size: 12.5px; color: var(--ink-soft); text-align: center; }
 
 .pv-prose { padding: 8px 0 4px; }
@@ -342,3 +381,51 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
 }
 .pv-foot .demo-nav__brand { gap: 8px; }
 .pv-foot .demo-nav__mark { width: 22px; height: 22px; font-size: 10px; }
+
+/*
+  Blog Library. Real-post cards mirror davonex.com's own .post-card layout
+  (image, h3 link, excerpt, post-meta, read-link), built from its live CSS,
+  populated with the real, live, public post list copied into REAL_DAVONEX_POSTS
+  in demo-data.js (titles/excerpts/dates/read-times verbatim). No image is
+  hotlinked from davonex.com anywhere (that would be a live third-party request
+  on every page load); each card uses a labeled placeholder block instead.
+  "Read the real post" links open the real davonex.com URL directly.
+*/
+.library-intro { font-size: 14px; color: var(--ink-soft); max-width: 720px; margin: 0 0 26px; }
+.library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+@media (max-width: 860px) { .library-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 580px) { .library-grid { grid-template-columns: 1fr; } }
+
+.post-card {
+  display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--r-md); padding: 20px 18px; box-shadow: var(--shadow-sm); position: relative;
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s, border-color .28s;
+}
+.post-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: rgba(19,107,238,.3); }
+.post-card__img {
+  width: 100%; aspect-ratio: 16/9; border-radius: 10px; border: 1px solid var(--line);
+  background: linear-gradient(135deg, var(--navy), var(--blue-deep));
+  display: grid; place-items: center; overflow: hidden;
+}
+.post-card__img span { color: rgba(255,255,255,.8); font-family: var(--mono); font-size: 12px; letter-spacing: .05em; }
+.post-card__img.is-demo { background: none; }
+.post-card__img.is-demo img { width: 100%; height: 100%; object-fit: cover; }
+.post-card h3 { margin: 15px 0 0; font-size: 1.02rem; line-height: 1.3; }
+.post-card h3 a { color: var(--navy); transition: color .2s; }
+.post-card h3 a:hover { color: var(--blue); }
+.post-card .excerpt { margin-top: 10px; font-size: .92rem; color: var(--ink-soft); flex: 1; }
+.post-card .post-meta {
+  margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft);
+  display: flex; align-items: center; gap: 8px;
+}
+.post-card .post-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-soft); opacity: .5; }
+.post-card .read-link { margin-top: 12px; font-weight: 700; font-size: 13px; color: var(--blue); display: inline-flex; align-items: center; gap: 6px; }
+.post-card .read-link .arr { transition: transform .22s cubic-bezier(.2,.8,.2,1); }
+.post-card .read-link:hover .arr { transform: translateX(3px); }
+
+.post-card--demo { border: 1.5px solid var(--blue); box-shadow: var(--shadow-md); }
+.demo-ribbon {
+  display: inline-block; margin-top: 12px; font-family: var(--mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .04em; color: #fff; background: var(--blue); padding: 4px 10px; border-radius: 999px;
+}

@@ -1,4 +1,7 @@
-// Step-through logic for the fabricated demo run. No network calls anywhere here.
+// Step-through logic for the fabricated demo runs. No network calls anywhere here.
+// Real davonex.com post data (REAL_DAVONEX_POSTS) is a static snapshot copied at
+// build time, not fetched live; "Read the guide" links are normal outbound links
+// the user clicks, not requests this demo makes on its own.
 
 function escapeHtml(str) {
   return String(str)
@@ -6,6 +9,15 @@ function escapeHtml(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 }
+
+let currentRunId = PRESETS[0].id;
+let libraryDemo = null; // { runId, addedAt, expiresAt, tickHandle, timeoutHandle }
+
+function currentRun() {
+  return DEMO_RUNS[currentRunId];
+}
+
+// ============================ Step renderers ============================
 
 function renderJsonPanel(obj) {
   return `<pre class="json-panel">${escapeHtml(JSON.stringify(obj, null, 2))}</pre>`;
@@ -33,24 +45,19 @@ function renderArticle(article) {
   return html;
 }
 
-function renderImageStep(step) {
+function renderImageStep(run, step) {
   return `
-    <div class="image-placeholder">
-      <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="10" y="10" width="180" height="120" rx="10" fill="#FAFBFE" stroke="#062757" stroke-width="3"/>
-        <circle cx="60" cy="55" r="16" fill="#A9C9F8" stroke="#062757" stroke-width="2"/>
-        <path d="M20 120 L75 75 L110 100 L140 65 L190 120 Z" fill="#136BEE" stroke="#062757" stroke-width="2"/>
-      </svg>
-      <span class="image-placeholder__caption">Illustrative placeholder — the real system generates this with Gemini image generation</span>
+    <div class="hero-photo">
+      <img src="${run.hero_image}" alt="${escapeHtml(run.topic_title)}" loading="lazy">
+      <span class="hero-photo__caption">Real stock photo, not AI-generated — stands in for what the real system's Gemini image generation would produce. Credits in assets/images/CREDITS.md.</span>
     </div>
-    <p class="image-prompt">"${escapeHtml(DEMO_RUN.steps.find(s => s.id === 'image_prompt').output)}"</p>
+    <p class="image-prompt">"${escapeHtml(run.steps.find(s => s.id === 'image_prompt').output)}"</p>
     ${renderJsonPanel(step.usage)}
   `;
 }
 
-function renderPostPreview(step) {
-  const writer = DEMO_RUN.steps.find(s => s.id === "writer").article;
-  const plan = DEMO_RUN.steps.find(s => s.id === "plan").output;
+function renderPostPreview(run, step) {
+  const writer = run.steps.find(s => s.id === "writer").article;
   const displayUrl = step.published_url.replace(/^https?:\/\//, "");
   const wordCount = writer.intro.join(" ").split(/\s+/).length +
     writer.sections.reduce((n, s) => n + s.body.replace(/<[^>]+>/g, " ").split(/\s+/).length, 0);
@@ -73,13 +80,13 @@ function renderPostPreview(step) {
     <nav class="pv-breadcrumb" aria-label="Breadcrumb">
       <a href="#">Home</a><span class="sep">/</span>
       <a href="#">Blog</a><span class="sep">/</span>
-      <span aria-current="page">${escapeHtml(DEMO_RUN.topic_title)}</span>
+      <span aria-current="page">${escapeHtml(run.topic_title)}</span>
     </nav>
   `;
 
   const head = `
-    <span class="pv-post-tag">Maintenance Guide</span>
-    <h1>${escapeHtml(DEMO_RUN.topic_title)}</h1>
+    <span class="pv-post-tag">Guide</span>
+    <h1>${escapeHtml(run.topic_title)}</h1>
     <div class="pv-meta-row">
       <span>By Nordkast Coffee Supply</span><span class="dot"></span>
       <span>Published just now</span><span class="dot"></span>
@@ -89,15 +96,8 @@ function renderPostPreview(step) {
 
   const figure = `
     <figure class="pv-figure">
-      <div class="image-placeholder" style="padding:0;height:220px;border-radius:var(--r-md);border-style:solid;">
-        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:100%;height:100%;">
-          <rect width="200" height="140" fill="url(#pvgrad)"/>
-          <defs><linearGradient id="pvgrad" x1="0" y1="0" x2="200" y2="140"><stop offset="0" stop-color="#136BEE"/><stop offset="1" stop-color="#062757"/></linearGradient></defs>
-          <circle cx="60" cy="45" r="14" fill="#A9C9F8" opacity=".85"/>
-          <path d="M20 120 L75 70 L110 95 L140 60 L190 120 Z" fill="#0C4497" opacity=".6"/>
-        </svg>
-      </div>
-      <figcaption class="pv-figure__caption">Illustrative placeholder — the real system generates this with Gemini image generation</figcaption>
+      <img src="${run.hero_image}" alt="${escapeHtml(run.topic_title)}" loading="lazy">
+      <figcaption class="pv-figure__caption">Real stock photo, not AI-generated — stands in for the real system's Gemini image generation. Credits in assets/images/CREDITS.md.</figcaption>
     </figure>
   `;
 
@@ -124,7 +124,7 @@ function renderPostPreview(step) {
       <span class="av" aria-hidden="true">N</span>
       <div>
         <div class="a-name">Written by Nordkast Coffee Supply</div>
-        <div class="a-desc">We help home baristas keep their machines running clean and their shots consistent.</div>
+        <div class="a-desc">We help home baristas and coffee shoppers get more out of every bag and every shot.</div>
       </div>
     </div>
   `;
@@ -132,8 +132,8 @@ function renderPostPreview(step) {
   const finalCta = `
     <div class="pv-final-wrap">
       <div class="pv-final">
-        <h2>Never wonder if your machine needs a clean.</h2>
-        <p>Shop Nordkast Descale Concentrate, made for exactly this.</p>
+        <h2>Ready for your next bag?</h2>
+        <p>Shop Nordkast's current roasts and machine care essentials.</p>
         <button type="button" class="btn">Shop Coffee <span class="arr">&#8594;</span></button>
       </div>
     </div>
@@ -175,8 +175,8 @@ function renderPostPreview(step) {
   `;
 }
 
-function renderPublishStep(step) {
-  let html = renderPostPreview(step);
+function renderPublishStep(run, step) {
+  let html = renderPostPreview(run, step);
   html += `
     <div class="publish-card">
       <div><strong>Published to:</strong> <span class="publish-card__url">${escapeHtml(step.published_url)}</span></div>
@@ -197,7 +197,7 @@ function renderPublishStep(step) {
   return html;
 }
 
-function renderStep(step) {
+function renderStep(run, step) {
   let body = "";
   if (step.type === "json") {
     if (step.input) body += `<p><strong>Input</strong></p>${renderJsonPanel(step.input)}<p><strong>Output</strong></p>`;
@@ -207,9 +207,9 @@ function renderStep(step) {
   } else if (step.type === "text") {
     body = `<p class="image-prompt">${escapeHtml(step.output)}</p>`;
   } else if (step.type === "image") {
-    body = renderImageStep(step);
+    body = renderImageStep(run, step);
   } else if (step.type === "publish") {
-    body = renderPublishStep(step);
+    body = renderPublishStep(run, step);
   }
 
   return `
@@ -226,12 +226,51 @@ function renderStep(step) {
   `;
 }
 
-function buildUI() {
+// ============================ Preset autofill ============================
+
+function renderPresetChips() {
+  const row = document.getElementById("preset-row");
+  row.innerHTML = PRESETS.map(p => `
+    <button type="button" class="preset-chip${p.id === currentRunId ? " is-active" : ""}" data-preset="${p.id}">
+      ${escapeHtml(p.chip)}
+    </button>
+  `).join("");
+}
+
+function renderBriefPreview() {
+  const run = currentRun();
+  const brief = run.steps.find(s => s.id === "brief");
+  const preset = PRESETS.find(p => p.id === currentRunId);
+  const modeled = preset.modeledAfter
+    ? `<p class="modeled-after">Input pattern modeled after a real davonex.com post: <a href="https://davonex.com/blog/${preset.modeledAfter.slug}/" target="_blank" rel="noopener">${escapeHtml(preset.modeledAfter.title)}</a></p>`
+    : "";
+  document.getElementById("brief-preview").innerHTML = `
+    <div class="entity-grid">
+      <div class="entity"><div class="k">Topic</div><div class="v">${escapeHtml(brief.output.topic)}</div></div>
+      <div class="entity" style="grid-column:1/-1"><div class="k">Description</div><div class="v" style="font-weight:400">${escapeHtml(brief.output.description)}</div></div>
+      <div class="entity" style="grid-column:1/-1"><div class="k">Additional details</div><div class="v" style="font-weight:400">${escapeHtml(brief.output.additional_details)}</div></div>
+    </div>
+    ${modeled}
+  `;
+}
+
+function selectPreset(id) {
+  currentRunId = id;
+  renderPresetChips();
+  renderBriefPreview();
+  buildStepsUI();
+  resetDemo();
+}
+
+// ============================ Pipeline run ============================
+
+function buildStepsUI() {
+  const run = currentRun();
   const stepsContainer = document.getElementById("steps");
-  stepsContainer.innerHTML = DEMO_RUN.steps.map(renderStep).join("");
+  stepsContainer.innerHTML = run.steps.map(s => renderStep(run, s)).join("");
 
   const rail = document.getElementById("rail");
-  rail.innerHTML = DEMO_RUN.steps.map((s, i) =>
+  rail.innerHTML = run.steps.map((s, i) =>
     `<div class="rail__dot" data-idx="${i}">${escapeHtml(s.title)}</div>`
   ).join("");
 }
@@ -240,6 +279,7 @@ function runPipeline() {
   const runBtn = document.getElementById("run-btn");
   const resetBtn = document.getElementById("reset-btn");
   runBtn.disabled = true;
+  document.querySelectorAll(".preset-chip").forEach(c => c.disabled = true);
 
   const dots = document.querySelectorAll(".rail__dot");
   const steps = document.querySelectorAll(".step");
@@ -252,6 +292,8 @@ function runPipeline() {
     }
     if (i >= steps.length) {
       resetBtn.style.display = "inline-block";
+      document.querySelectorAll(".preset-chip").forEach(c => c.disabled = false);
+      addToLibrary(currentRunId);
       return;
     }
     dots[i].classList.add("is-active");
@@ -268,11 +310,119 @@ function resetDemo() {
   document.querySelectorAll(".step").forEach(s => s.classList.remove("is-visible"));
   document.getElementById("run-btn").disabled = false;
   document.getElementById("reset-btn").style.display = "none";
+  document.querySelectorAll(".preset-chip").forEach(c => c.disabled = false);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+// ============================ Blog Library ============================
+
+const LIBRARY_LIFETIME_MS = 15 * 60 * 1000;
+
+function addToLibrary(runId) {
+  if (libraryDemo) {
+    clearInterval(libraryDemo.tickHandle);
+    clearTimeout(libraryDemo.timeoutHandle);
+  }
+  const addedAt = Date.now();
+  const expiresAt = addedAt + LIBRARY_LIFETIME_MS;
+
+  libraryDemo = {
+    runId, addedAt, expiresAt,
+    tickHandle: setInterval(renderLibrary, 1000),
+    timeoutHandle: setTimeout(() => {
+      libraryDemo = null;
+      renderLibrary();
+    }, LIBRARY_LIFETIME_MS)
+  };
+  renderLibrary();
+}
+
+function formatCountdown(ms) {
+  const total = Math.max(0, Math.ceil(ms / 1000));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function realPostCard(post) {
+  const url = `https://davonex.com/blog/${post.slug}/`;
+  return `
+    <article class="post-card">
+      <div class="post-card__img" aria-hidden="true">
+        <span>davonex.com</span>
+      </div>
+      <h3><a href="${url}" target="_blank" rel="noopener">${escapeHtml(post.title)}</a></h3>
+      <p class="excerpt">${escapeHtml(post.excerpt)}</p>
+      <div class="post-meta"><span>${escapeHtml(post.date)}</span><span class="dot"></span><span>${escapeHtml(post.read_time)}</span></div>
+      <a class="read-link" href="${url}" target="_blank" rel="noopener">Read the real post <span class="arr">&#8594;</span></a>
+    </article>
+  `;
+}
+
+function demoPostCard() {
+  const run = DEMO_RUNS[libraryDemo.runId];
+  const remaining = libraryDemo.expiresAt - Date.now();
+  return `
+    <article class="post-card post-card--demo" id="demo-post-card">
+      <div class="post-card__img is-demo" aria-hidden="true">
+        <img src="${run.hero_image}" alt="${escapeHtml(run.topic_title)}" loading="lazy">
+      </div>
+      <span class="demo-ribbon">Demo · fabricated · removes in ${formatCountdown(remaining)}</span>
+      <h3><a href="#panel-pipeline" data-open-pipeline="1">${escapeHtml(run.topic_title)}</a></h3>
+      <p class="excerpt">${escapeHtml(run.steps.find(s => s.id === "writer").article.intro[0])}</p>
+      <div class="post-meta"><span>Nordkast Coffee Supply (fictional)</span><span class="dot"></span><span>just now</span></div>
+      <a class="read-link" href="#panel-pipeline" data-open-pipeline="1">View the run <span class="arr">&#8594;</span></a>
+    </article>
+  `;
+}
+
+function renderLibrary() {
+  const grid = document.getElementById("library-grid");
+  const countEl = document.getElementById("library-tab-count");
+  let html = "";
+  let total = REAL_DAVONEX_POSTS.length;
+  if (libraryDemo) {
+    html += demoPostCard();
+    total += 1;
+  }
+  html += REAL_DAVONEX_POSTS.map(realPostCard).join("");
+  grid.innerHTML = html;
+  countEl.textContent = `(${total})`;
+}
+
+// ============================ Tabs ============================
+
+function switchTab(tabId) {
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("is-active", t.dataset.tab === tabId));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("is-active", p.id === `panel-${tabId}`));
+  if (tabId === "pipeline") window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ============================ Init ============================
+
 document.addEventListener("DOMContentLoaded", () => {
-  buildUI();
+  renderPresetChips();
+  renderBriefPreview();
+  buildStepsUI();
+  renderLibrary();
+
   document.getElementById("run-btn").addEventListener("click", runPipeline);
   document.getElementById("reset-btn").addEventListener("click", resetDemo);
+
+  document.getElementById("preset-row").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-preset]");
+    if (!btn || btn.disabled) return;
+    selectPreset(btn.dataset.preset);
+  });
+
+  document.querySelectorAll(".tab").forEach(t => {
+    t.addEventListener("click", () => switchTab(t.dataset.tab));
+  });
+
+  document.getElementById("library-grid").addEventListener("click", (e) => {
+    const opener = e.target.closest("[data-open-pipeline]");
+    if (!opener) return;
+    e.preventDefault();
+    switchTab("pipeline");
+  });
 });
