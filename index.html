@@ -67,14 +67,19 @@
     <section class="panel" id="panel-library">
       <p class="section-label" style="margin-top:0">Nordkast Coffee Supply / Blog</p>
       <p class="library-intro">
-        This list mirrors davonex.com/blog: by default it shows the real, live posts
-        published there by the actual production pipeline (titles, excerpts, dates,
-        and read times copied verbatim; no image is fetched from davonex.com — see
-        the caption on each card). Run the pipeline on the other tab and a fabricated
-        demo post is added here for 15 minutes, clearly marked, then automatically
+        This mirrors davonex.com/blog completely: all 15 real posts this pipeline has
+        actually published there, stored locally with their real images and full text
+        so this page works fully offline. Click any card to read it in full. Run the
+        pipeline on the other tab and a fabricated demo post (against the invented
+        Nordkast brand) is added here for 15 minutes, clearly marked, then automatically
         removed.
       </p>
       <div class="library-grid" id="library-grid"></div>
+    </section>
+
+    <section class="panel" id="panel-reader">
+      <button class="btn btn--ghost" type="button" id="reader-back">&larr; Back to Blog Library</button>
+      <article class="reader" id="reader-article"></article>
     </section>
 
   </main>

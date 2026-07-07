@@ -17,14 +17,15 @@ live post history from an actual configured client.
 
 ## What it is
 
-A two-tab static page. **Run the pipeline** steps through all 7 stages of the
-real system's architecture against a chosen example run, for an invented brand,
-"Nordkast Coffee Supply." **Blog Library** mirrors davonex.com/blog: by default
-it shows the real, live post list from that actual client (titles, excerpts,
-dates, and read times copied verbatim), and a completed pipeline run adds one
-fabricated demo post to that list for 15 minutes, clearly marked, before it's
-automatically removed. Nothing here is a real client's actual generation, and no
-API is called anywhere.
+A three-panel static page. **Run the pipeline** steps through all 7 stages of
+the real system's architecture against a chosen example run, for an invented
+brand, "Nordkast Coffee Supply." **Blog Library** mirrors davonex.com/blog
+completely: all 15 real posts that client has actually published, stored
+locally with their real images and full article text, each opening to a full
+in-page reader. A completed pipeline run adds one fabricated demo post to that
+list for 15 minutes, clearly marked, before it's automatically removed.
+Nothing here is a real client's actual generation, and no API is called
+anywhere.
 
 ## Features
 
@@ -44,15 +45,17 @@ API is called anywhere.
   `assets/images/CREDITS.md`. Each is captioned "real stock photo, not
   AI-generated" so it's never mistaken for the real system's actual Gemini
   output.
-- **Blog Library tab**: a static, hand-copied snapshot of davonex.com/blog's
-  real 15-post list (`REAL_DAVONEX_POSTS` in `demo-data.js`), styled after the
-  real site's own `.post-card` grid. No davonex.com image is hotlinked (that
-  would be a live third-party request on every page load); each real card uses
-  a labeled placeholder block instead, and "Read the real post" opens the
-  actual davonex.com URL. Completing a pipeline run adds one fabricated demo
-  card to the top of this list with a live "removes in mm:ss" countdown ribbon
-  and the run's real stock photo; it's replaced if you run again, and expires
-  automatically after 15 minutes either way.
+- **Blog Library tab, complete**: all 15 real posts from davonex.com/blog
+  (`REAL_DAVONEX_POSTS` in `demo-data.js`) — real titles, excerpts, dates, read
+  times, hero images, full article bodies, and references, fetched once and
+  stored locally in `assets/posts/` so the page works fully offline. Every
+  card, real or demo, opens to a full in-page article reader styled after the
+  real site's own article template (hero image, byline, prose with citations
+  and tables, references, a provenance link back to the original URL).
+  Completing a pipeline run adds one fabricated demo card to the top of this
+  list with a live "removes in mm:ss" countdown ribbon and the run's own hero
+  photo; it's replaced if you run again, and expires automatically after 15
+  minutes either way.
 - A permanent banner disclosing this is a scripted demo, visible at every step.
 - The one headline cost figure shown per run ($0.35–$0.42 depending on preset)
   is anchored to the real, already-published production cost range from the
@@ -72,13 +75,17 @@ API is called anywhere.
 Plain HTML, CSS, and vanilla JavaScript. No build step, no framework, no backend,
 no network calls at runtime. `demo-data.js` holds `DEMO_RUNS` (the three
 fabricated runs, each with all 7 steps), `PRESETS` (the autofill chip metadata),
-and `REAL_DAVONEX_POSTS` (the real post-list snapshot). `app.js` drives tab
-switching, preset selection, the step-through reveal, the Publish step's article
-preview, and the Blog Library's countdown/expiry logic. `styles.css` uses
-davonex.com's public color/font/radius/shadow tokens and component patterns
-(copied from its live CSS) so the demo reads as a genuine preview of where this
-pipeline's output ends up, not a generic mockup. `assets/images/` holds the
-three real, locally-stored stock photos and their license credits.
+and `REAL_DAVONEX_POSTS` (all 15 real posts — full body HTML, references, and a
+local image path per post). `app.js` drives tab switching, preset selection,
+the step-through reveal, the Publish step's article preview, the in-page
+article reader, and the Blog Library's countdown/expiry logic. `styles.css`
+uses davonex.com's public color/font/radius/shadow tokens, component patterns,
+and article-template layout (copied from its live CSS and a real published
+post) so the demo reads as a genuine preview of where this pipeline's output
+ends up, not a generic mockup. `assets/images/` holds the three real,
+locally-stored stock photos for the fabricated runs; `assets/posts/` holds the
+15 real davonex.com hero images. Both have a `CREDITS.md` explaining
+provenance.
 
 ## Setup
 
@@ -89,8 +96,9 @@ server.
 
 Pick an example on the "Run the pipeline" tab (or keep the default), click "Run
 the pipeline," and watch it step through all 7 stages. Switch to "Blog Library"
-to see the real davonex.com post list, plus the demo post you just generated
-sitting at the top with a live countdown until it's removed.
+to see all 15 real davonex.com posts, plus the demo post you just generated
+sitting at the top with a live countdown until it's removed. Click any card,
+real or demo, to read the full article in-page.
 
 ## Challenges
 
@@ -100,16 +108,20 @@ sitting at the top with a live countdown until it's removed.
   References list) was written to match the real system's actual prompt
   templates, not invented from scratch, for all three runs.
 - **Deciding what's honestly reusable from a real client's public content.**
-  davonex.com's own post list is real, live, and already public, so showing it
-  verbatim is more honest than inventing a fake one; but its images are not
-  reused (no hotlinking, no downloading and re-serving davonex's own client
-  photos), since those aren't this demo's to redistribute.
-- **Sourcing real photos without breaking the self-contained, no-external-calls
-  rule.** Hotlinking a live image URL would mean this static demo makes a
-  network request to a third party on every page load. Downloading three
-  freely-licensed (CC BY / CC BY-SA / public domain) photos once and storing
-  them locally, with full attribution, keeps the demo honest about using real
-  (not AI-generated) images while staying fully self-contained.
+  davonex.com's own post list, images, and full article text are real, live,
+  and already public, and this real production pipeline is what actually
+  produced them, so reproducing them locally (with clear provenance links back
+  to the original) is more honest than inventing a fake library or leaving the
+  Blog Library as titles-only stubs.
+- **Sourcing real content without breaking the self-contained, no-live-calls
+  rule.** Hotlinking live image or page URLs would mean this static demo makes
+  a network request to a third party every time a page loads or a post opens.
+  Fetching all 15 real posts' images and full body text once and storing them
+  locally (`assets/posts/`), with a `CREDITS.md` explaining provenance, keeps
+  the demo honest about using real content while staying fully self-contained.
+  The three fabricated-run photos use a separate approach (freely-licensed
+  CC BY / CC BY-SA / public domain stock photos), since those illustrate an
+  invented brand rather than reproducing a real client's own work.
 - **Disclosing fabrication without undermining the demo.** A banner that only
   appeared once, or lived in the README, would get missed by anyone who scrolls
   past it. It's pinned and visible through the whole page instead, and the

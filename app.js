@@ -345,18 +345,46 @@ function formatCountdown(ms) {
 }
 
 function realPostCard(post) {
-  const url = `https://davonex.com/blog/${post.slug}/`;
   return `
-    <article class="post-card">
-      <div class="post-card__img" aria-hidden="true">
-        <span>davonex.com</span>
-      </div>
-      <h3><a href="${url}" target="_blank" rel="noopener">${escapeHtml(post.title)}</a></h3>
+    <article class="post-card" data-open-post="${post.slug}">
+      <div class="post-card__img"><img src="${post.image}" alt="${escapeHtml(post.title)}" loading="lazy"></div>
+      <h3>${escapeHtml(post.title)}</h3>
       <p class="excerpt">${escapeHtml(post.excerpt)}</p>
       <div class="post-meta"><span>${escapeHtml(post.date)}</span><span class="dot"></span><span>${escapeHtml(post.read_time)}</span></div>
-      <a class="read-link" href="${url}" target="_blank" rel="noopener">Read the real post <span class="arr">&#8594;</span></a>
+      <span class="read-link">Read the post <span class="arr">&#8594;</span></span>
     </article>
   `;
+}
+
+function openRealPostReader(slug) {
+  const post = REAL_DAVONEX_POSTS.find(p => p.slug === slug);
+  if (!post) return;
+  const refsHtml = post.references.length ? `
+    <div class="reader__refs">
+      <h2>References</h2>
+      <ol>${post.references.map(r => `<li><a href="${r.url}" target="_blank" rel="noopener">${escapeHtml(r.title)}</a>. <span>(${escapeHtml(r.date)})</span></li>`).join("")}</ol>
+    </div>
+  ` : "";
+  document.getElementById("reader-article").innerHTML = `
+    <div class="reader__hero"><img src="${post.image}" alt="${escapeHtml(post.title)}"></div>
+    <div class="reader__body">
+      <h1>${escapeHtml(post.title)}</h1>
+      <div class="reader__meta">
+        <span>${escapeHtml(post.by)}</span><span class="dot"></span>
+        <span>${escapeHtml(post.date)}</span><span class="dot"></span>
+        <span>${escapeHtml(post.read_time)}</span>
+      </div>
+      <div class="reader__prose">${post.body_html}</div>
+      ${refsHtml}
+      <div class="reader__provenance">
+        This is the real, published content from davonex.com, one of this pipeline's actual
+        configured clients, fetched and stored locally so this demo works fully offline.
+        Original: <a href="https://davonex.com/blog/${post.slug}/" target="_blank" rel="noopener">davonex.com/blog/${post.slug}/</a>
+      </div>
+    </div>
+  `;
+  switchTab("reader");
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function demoPostCard() {
@@ -421,8 +449,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("library-grid").addEventListener("click", (e) => {
     const opener = e.target.closest("[data-open-pipeline]");
-    if (!opener) return;
-    e.preventDefault();
-    switchTab("pipeline");
+    if (opener) { e.preventDefault(); switchTab("pipeline"); return; }
+    const card = e.target.closest("[data-open-post]");
+    if (card) { openRealPostReader(card.dataset.openPost); }
   });
+
+  document.getElementById("reader-back").addEventListener("click", () => switchTab("library"));
 });

@@ -384,12 +384,11 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
 
 /*
   Blog Library. Real-post cards mirror davonex.com's own .post-card layout
-  (image, h3 link, excerpt, post-meta, read-link), built from its live CSS,
-  populated with the real, live, public post list copied into REAL_DAVONEX_POSTS
-  in demo-data.js (titles/excerpts/dates/read-times verbatim). No image is
-  hotlinked from davonex.com anywhere (that would be a live third-party request
-  on every page load); each card uses a labeled placeholder block instead.
-  "Read the real post" links open the real davonex.com URL directly.
+  (image, h3, excerpt, post-meta, read-link), built from its live CSS,
+  populated with the real, live, public post list stored in REAL_DAVONEX_POSTS
+  in demo-data.js — real images, full body text, and references, fetched and
+  stored locally once so this page works fully offline. Clicking a card opens
+  the full real article in-page via the reader panel below.
 */
 .library-intro { font-size: 14px; color: var(--ink-soft); max-width: 720px; margin: 0 0 26px; }
 .library-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -400,19 +399,15 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
   display: flex; flex-direction: column; background: var(--paper); border: 1px solid var(--line);
   border-radius: var(--r-md); padding: 20px 18px; box-shadow: var(--shadow-sm); position: relative;
   transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s, border-color .28s;
+  cursor: pointer;
 }
 .post-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: rgba(19,107,238,.3); }
 .post-card__img {
   width: 100%; aspect-ratio: 16/9; border-radius: 10px; border: 1px solid var(--line);
-  background: linear-gradient(135deg, var(--navy), var(--blue-deep));
-  display: grid; place-items: center; overflow: hidden;
+  overflow: hidden; background: var(--bg-alt);
 }
-.post-card__img span { color: rgba(255,255,255,.8); font-family: var(--mono); font-size: 12px; letter-spacing: .05em; }
-.post-card__img.is-demo { background: none; }
-.post-card__img.is-demo img { width: 100%; height: 100%; object-fit: cover; }
-.post-card h3 { margin: 15px 0 0; font-size: 1.02rem; line-height: 1.3; }
-.post-card h3 a { color: var(--navy); transition: color .2s; }
-.post-card h3 a:hover { color: var(--blue); }
+.post-card__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.post-card h3 { margin: 15px 0 0; font-size: 1.02rem; line-height: 1.3; color: var(--navy); }
 .post-card .excerpt { margin-top: 10px; font-size: .92rem; color: var(--ink-soft); flex: 1; }
 .post-card .post-meta {
   margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
@@ -422,10 +417,38 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
 .post-card .post-meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-soft); opacity: .5; }
 .post-card .read-link { margin-top: 12px; font-weight: 700; font-size: 13px; color: var(--blue); display: inline-flex; align-items: center; gap: 6px; }
 .post-card .read-link .arr { transition: transform .22s cubic-bezier(.2,.8,.2,1); }
-.post-card .read-link:hover .arr { transform: translateX(3px); }
+.post-card:hover .read-link .arr { transform: translateX(3px); }
 
 .post-card--demo { border: 1.5px solid var(--blue); box-shadow: var(--shadow-md); }
 .demo-ribbon {
   display: inline-block; margin-top: 12px; font-family: var(--mono); font-size: 10.5px; font-weight: 700;
   letter-spacing: .04em; color: #fff; background: var(--blue); padding: 4px 10px; border-radius: 999px;
 }
+
+/* ============================ In-page article reader (real davonex posts) ============================ */
+.reader {
+  max-width: 720px; margin: 20px auto 0; background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--r-lg); box-shadow: var(--shadow-md); padding: 0 0 30px; overflow: hidden;
+}
+.reader__hero { width: 100%; aspect-ratio: 16/9; overflow: hidden; background: var(--bg-alt); }
+.reader__hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.reader__body { padding: 26px 32px 0; }
+.reader__body h1 { font-size: clamp(1.5rem, 3vw, 2rem); margin: 0 0 12px; color: var(--navy); }
+.reader__meta { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); margin-bottom: 22px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.reader__meta .dot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-soft); opacity: .5; }
+.reader__prose p { margin-top: 14px; font-size: 1rem; color: var(--ink-soft); line-height: 1.72; }
+.reader__prose h2 { font-size: clamp(1.25rem, 2.2vw, 1.5rem); line-height: 1.15; margin-top: 34px; color: var(--navy); }
+.reader__prose h3 { font-size: 1.1rem; margin-top: 22px; color: var(--navy); }
+.reader__prose ul, .reader__prose ol { margin-top: 13px; padding-left: 22px; display: grid; gap: 8px; }
+.reader__prose li { color: var(--ink-soft); font-size: 1rem; line-height: 1.55; }
+.reader__prose table { width: 100%; border-collapse: collapse; font-size: .92rem; margin-top: 20px; border: 1px solid var(--line); border-radius: var(--r-sm); overflow: hidden; }
+.reader__prose th, .reader__prose td { text-align: left; padding: 10px 13px; border-bottom: 1px solid var(--line); color: var(--ink-soft); }
+.reader__prose thead th, .reader__prose th { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; background: var(--bg-alt); }
+.reader__prose sup.citation a { color: var(--blue); font-weight: 700; text-decoration: none; }
+.reader__refs { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); }
+.reader__refs h2 { font-size: 1.05rem; color: var(--navy); margin-bottom: 10px; }
+.reader__refs ol { padding-left: 20px; display: grid; gap: 6px; }
+.reader__refs li { font-size: .85rem; color: var(--ink-soft); }
+.reader__refs a { color: var(--blue); font-weight: 600; }
+.reader__provenance { margin-top: 26px; padding: 14px 16px; background: var(--bg-alt); border-radius: var(--r-sm); font-size: 12px; color: var(--ink-soft); }
+.reader__provenance a { color: var(--blue); font-weight: 600; }
