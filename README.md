@@ -1,4 +1,4 @@
-# Blog Posting Pipeline — Demo
+# Blog Posting Pipeline: Demo
 
 A fabricated, interactive walkthrough of the `blog-posting-pipeline` project's
 7-step architecture, built so the pipeline can be seen running without exposing
@@ -46,7 +46,7 @@ anywhere.
   AI-generated" so it's never mistaken for the real system's actual Gemini
   output.
 - **Blog Library tab, complete**: all 15 real posts from davonex.com/blog
-  (`REAL_DAVONEX_POSTS` in `demo-data.js`) — real titles, excerpts, dates, read
+  (`REAL_DAVONEX_POSTS` in `demo-data.js`): real titles, excerpts, dates, read
   times, hero images, full article bodies, and references, fetched once and
   stored locally in `assets/posts/` so the page works fully offline. Every
   card, real or demo, opens to a full in-page article reader styled after the
@@ -75,7 +75,7 @@ anywhere.
 Plain HTML, CSS, and vanilla JavaScript. No build step, no framework, no backend,
 no network calls at runtime. `demo-data.js` holds `DEMO_RUNS` (the three
 fabricated runs, each with all 7 steps), `PRESETS` (the autofill chip metadata),
-and `REAL_DAVONEX_POSTS` (all 15 real posts — full body HTML, references, and a
+and `REAL_DAVONEX_POSTS` (all 15 real posts, full body HTML, references, and a
 local image path per post). `app.js` drives tab switching, preset selection,
 the step-through reveal, the Publish step's article preview, the in-page
 article reader, and the Blog Library's countdown/expiry logic. `styles.css`
@@ -132,7 +132,7 @@ real or demo, to read the full article in-page.
 
 Building a demo for a system you can't show directly forces you to be precise
 about what's actually architecture (reusable, disclosable) versus what's actually
-business logic (the real prompts, the real client rules) — the two are easy to
+business logic (the real prompts, the real client rules); the two are easy to
 conflate when you're used to treating "the code" as one thing. Mixing a real,
 public data source (the davonex post list) with clearly-labeled fabricated
 content in the same list turned out to be a stronger honesty pattern than either
@@ -143,5 +143,5 @@ actually shipping.
 
 A real client publishes dozens of posts a month; the 15-post snapshot here will
 drift out of date. A live version could re-fetch that list periodically instead
-of a static copy — skipped here to keep this demo's "no live calls" guarantee
+of a static copy; skipped here to keep this demo's "no live calls" guarantee
 airtight rather than adding the one exception that would break it.

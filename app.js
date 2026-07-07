@@ -49,7 +49,7 @@ function renderImageStep(run, step) {
   return `
     <div class="hero-photo">
       <img src="${run.hero_image}" alt="${escapeHtml(run.topic_title)}" loading="lazy">
-      <span class="hero-photo__caption">Real stock photo, not AI-generated — stands in for what the real system's Gemini image generation would produce. Credits in assets/images/CREDITS.md.</span>
+      <span class="hero-photo__caption">Real stock photo, not AI-generated: stands in for what the real system's Gemini image generation would produce. Credits in assets/images/CREDITS.md.</span>
     </div>
     <p class="image-prompt">"${escapeHtml(run.steps.find(s => s.id === 'image_prompt').output)}"</p>
     ${renderJsonPanel(step.usage)}
@@ -97,7 +97,7 @@ function renderPostPreview(run, step) {
   const figure = `
     <figure class="pv-figure">
       <img src="${run.hero_image}" alt="${escapeHtml(run.topic_title)}" loading="lazy">
-      <figcaption class="pv-figure__caption">Real stock photo, not AI-generated — stands in for the real system's Gemini image generation. Credits in assets/images/CREDITS.md.</figcaption>
+      <figcaption class="pv-figure__caption">Real stock photo, not AI-generated: stands in for the real system's Gemini image generation. Credits in assets/images/CREDITS.md.</figcaption>
     </figure>
   `;
 

@@ -386,7 +386,7 @@ footer a.underline { text-decoration: underline; color: var(--blue-deep); }
   Blog Library. Real-post cards mirror davonex.com's own .post-card layout
   (image, h3, excerpt, post-meta, read-link), built from its live CSS,
   populated with the real, live, public post list stored in REAL_DAVONEX_POSTS
-  in demo-data.js — real images, full body text, and references, fetched and
+  in demo-data.js, real images, full body text, and references, fetched and
   stored locally once so this page works fully offline. Clicking a card opens
   the full real article in-page via the reader panel below.
 */
