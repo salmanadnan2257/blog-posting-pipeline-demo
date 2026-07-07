@@ -30,15 +30,24 @@ Espresso Machine." Nothing here is a real client, and no API is called anywhere.
 - The one headline cost figure shown ($0.37–$0.40 per post) is the real,
   already-published production cost from the source project's README; the
   per-step cost line items underneath are illustrative and labeled as such.
+- The Publish step includes a post-preview card showing what the fabricated run
+  would look like published: a browser-chrome bar with the URL, a hero image
+  area, an eyebrow, title, byline, and lede, styled with the real, public design
+  tokens (colors, font, corner radii) read directly off the live site this
+  pipeline actually publishes to. This is presentation only: static HTML built
+  from the fabricated run, no request to any real site, and none of that site's
+  own code or private integration details are part of this repo.
 
 ## Architecture
 
 Plain HTML, CSS, and vanilla JavaScript. No build step, no framework, no backend,
 no network calls. `demo-data.js` holds the fabricated run as a plain object;
-`app.js` reveals each step in sequence with a short animated delay and drives a
-progress rail; `styles.css` is a self-contained copy of the design tokens used
-across the rest of the portfolio, so this page reads as part of the same body of
-work without depending on that site at runtime.
+`app.js` reveals each step in sequence with a short animated delay, drives a
+progress rail, and renders the Publish step's post-preview card; `styles.css`
+uses the real site's public color/font/radius/shadow custom properties (copied
+from its live `:root` block, since that's just visual design language every
+visitor's browser already renders) so the demo reads as a genuine preview of
+where this pipeline's output ends up, not a generic mockup.
 
 ## Setup
 

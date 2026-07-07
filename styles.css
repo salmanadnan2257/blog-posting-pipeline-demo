@@ -8,18 +8,36 @@
   font-style: normal;
 }
 
+/*
+  Palette below matches the real, live public design tokens read directly off
+  davonex.com's own CSS (:root custom properties), since this pipeline publishes
+  to that exact site. Colors and radii are copied 1:1; nothing here is invented.
+  This is public visual design language (what every visitor's browser already
+  renders), not the site's private server code or API integration, which stays
+  out of this repo entirely.
+*/
 :root {
-  --cream: #FFFDF5;
-  --cream-2: #FBF6E6;
-  --ink: #16130E;
-  --ink-soft: #4b463d;
-  --coral: #FF6B6B;
-  --yellow: #FFD93D;
-  --purple: #C4B5FD;
-  --line: #16130E;
-  --shadow: 6px 6px 0 rgba(22, 19, 14, 0.9);
-  --shadow-sm: 4px 4px 0 rgba(22, 19, 14, 0.9);
-  --radius: 18px;
+  --bg: #FAFBFE;
+  --bg-alt: #EFF4FD;
+  --paper: #FFFFFF;
+  --blue: #136BEE;
+  --blue-deep: #0C4497;
+  --navy: #062757;
+  --tint: #A9C9F8;
+  --ink: #08152B;
+  --ink-soft: #46597A;
+  --good: #15803D;
+  --line: rgba(6, 39, 87, .12);
+  --line-strong: rgba(6, 39, 87, .22);
+  --r-lg: 26px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --shadow-sm: 0 1px 2px rgba(8, 21, 43, .06), 0 6px 18px rgba(8, 21, 43, .05);
+  --shadow-md: 0 10px 30px rgba(12, 68, 151, .12), 0 2px 8px rgba(8, 21, 43, .06);
+  --shadow-blue: 0 18px 40px rgba(19, 107, 238, .28);
+  /* kept for the fabrication-disclosure banner, deliberately not brand-blue so it reads as a system notice, not site content */
+  --warn: #FFD93D;
+  --warn-line: #16130E;
   --wrap: 880px;
 }
 
@@ -28,7 +46,7 @@
 body {
   margin: 0;
   font-family: 'Space Grotesk', system-ui, -apple-system, Segoe UI, sans-serif;
-  background: var(--cream);
+  background: var(--bg);
   color: var(--ink);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
@@ -47,11 +65,13 @@ code, pre {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* Disclosure banner: permanent, non-dismissable */
+/* Disclosure banner: permanent, non-dismissable. Deliberately not brand-blue,
+   so it reads as a system notice sitting on top of the template, not as part
+   of the site's own content. */
 .demo-banner {
-  background: var(--yellow);
-  border-bottom: 3px solid var(--line);
-  color: var(--ink);
+  background: var(--warn);
+  border-bottom: 3px solid var(--warn-line);
+  color: var(--warn-line);
   font-size: 14px;
   font-weight: 600;
   padding: 10px 0;
@@ -60,7 +80,8 @@ code, pre {
 .demo-banner strong { text-decoration: underline; }
 
 header.hero {
-  border-bottom: 3px solid var(--line);
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
   padding: 48px 0 32px;
 }
 .kicker {
@@ -88,14 +109,14 @@ h1 {
   font-size: 15px;
   padding: 12px 22px;
   border-radius: 999px;
-  border: 3px solid var(--line);
+  border: none;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: transform .12s ease;
+  transition: transform .12s ease, box-shadow .12s ease;
 }
-.btn:active { transform: translate(2px, 2px); box-shadow: none; }
-.btn--primary { background: var(--coral); color: var(--ink); }
-.btn--ghost { background: var(--cream); color: var(--ink); }
+.btn:active { transform: translateY(1px); box-shadow: none; }
+.btn--primary { background: var(--blue); color: #fff; box-shadow: var(--shadow-blue); }
+.btn--ghost { background: var(--paper); color: var(--ink); border: 1px solid var(--line-strong); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
 
 /* Progress rail */
@@ -108,25 +129,26 @@ h1 {
 .rail__dot {
   flex: 1 1 0;
   min-width: 80px;
-  border: 2px solid var(--line);
-  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
   padding: 8px 10px;
   font-size: 12px;
   font-weight: 600;
-  background: var(--cream-2);
-  opacity: .5;
+  background: var(--bg-alt);
+  color: var(--ink-soft);
+  opacity: .6;
 }
-.rail__dot.is-active { opacity: 1; background: var(--yellow); }
-.rail__dot.is-done { opacity: 1; background: var(--cream-2); }
+.rail__dot.is-active { opacity: 1; background: var(--tint); color: var(--navy); }
+.rail__dot.is-done { opacity: 1; background: var(--bg-alt); color: var(--blue-deep); }
 .rail__dot.is-done::after { content: " ✓"; }
 
 main { padding: 40px 0 80px; }
 
 .step {
-  border: 3px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-md);
+  background: var(--paper);
   margin: 0 0 28px;
   padding: 24px;
   display: none;
@@ -138,7 +160,7 @@ main { padding: 40px 0 80px; }
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 14px;
-  border-bottom: 2px solid var(--cream-2);
+  border-bottom: 1px solid var(--line);
   padding-bottom: 10px;
 }
 .step__num {
@@ -146,21 +168,21 @@ main { padding: 40px 0 80px; }
   font-size: 13px;
   color: var(--ink-soft);
 }
-.step__title { font-size: 20px; margin: 0; }
+.step__title { font-size: 20px; margin: 0; color: var(--navy); }
 .step__model {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12px;
-  color: var(--ink-soft);
-  background: var(--cream-2);
+  color: var(--blue-deep);
+  background: var(--bg-alt);
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 3px 8px;
 }
 
 .json-panel {
-  background: var(--ink);
-  color: var(--cream);
-  border-radius: 12px;
+  background: var(--navy);
+  color: var(--tint);
+  border-radius: var(--r-md);
   padding: 16px;
   overflow-x: auto;
   font-size: 13px;
@@ -172,7 +194,7 @@ main { padding: 40px 0 80px; }
 .article {
   font-size: 15.5px;
 }
-.article h3 { font-size: 18px; margin: 20px 0 8px; }
+.article h3 { font-size: 18px; margin: 20px 0 8px; color: var(--navy); }
 .article table {
   border-collapse: collapse;
   width: 100%;
@@ -180,38 +202,38 @@ main { padding: 40px 0 80px; }
   font-size: 14px;
 }
 .article th, .article td {
-  border: 1px solid var(--ink-soft);
+  border: 1px solid var(--line);
   padding: 6px 10px;
   text-align: left;
 }
-.article .faq dt { font-weight: 700; margin-top: 10px; }
+.article .faq dt { font-weight: 700; margin-top: 10px; color: var(--navy); }
 .article .faq dd { margin: 4px 0 0; color: var(--ink-soft); }
-.article sup { color: var(--coral); font-weight: 700; }
+.article sup { color: var(--blue); font-weight: 700; }
 .article .refs {
   margin-top: 16px;
   padding-top: 12px;
-  border-top: 2px solid var(--cream-2);
+  border-top: 1px solid var(--line);
   font-size: 13px;
   color: var(--ink-soft);
 }
 
 .image-placeholder {
-  border: 3px dashed var(--ink-soft);
-  border-radius: 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
   padding: 32px;
   text-align: center;
-  background: linear-gradient(135deg, var(--yellow), var(--purple));
+  background: var(--bg-alt);
 }
 .image-placeholder svg { max-width: 220px; margin: 0 auto 12px; display: block; }
 .image-placeholder__caption {
   font-size: 13px;
-  color: var(--ink);
+  color: var(--navy);
   font-weight: 600;
-  background: var(--cream);
+  background: var(--paper);
   display: inline-block;
   padding: 6px 12px;
   border-radius: 999px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line-strong);
 }
 .image-prompt {
   margin-top: 14px;
@@ -221,15 +243,16 @@ main { padding: 40px 0 80px; }
 }
 
 .publish-card {
-  background: var(--cream-2);
-  border: 2px solid var(--line);
-  border-radius: 12px;
+  background: var(--bg-alt);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
   padding: 16px;
   margin-bottom: 16px;
 }
 .publish-card__url {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 14px;
+  color: var(--blue-deep);
 }
 
 .cost-table {
@@ -239,7 +262,7 @@ main { padding: 40px 0 80px; }
   margin: 10px 0;
 }
 .cost-table th, .cost-table td {
-  border: 1px solid var(--ink-soft);
+  border: 1px solid var(--line);
   padding: 6px 10px;
   text-align: left;
 }
@@ -247,6 +270,7 @@ main { padding: 40px 0 80px; }
   font-size: 22px;
   font-weight: 700;
   margin: 12px 0 4px;
+  color: var(--navy);
 }
 .cost-note {
   font-size: 12px;
@@ -256,9 +280,92 @@ main { padding: 40px 0 80px; }
 .controls { display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap; }
 
 footer {
-  border-top: 3px solid var(--line);
+  border-top: 1px solid var(--line);
   padding: 24px 0;
   font-size: 13px;
   color: var(--ink-soft);
 }
-footer a { text-decoration: underline; }
+footer a { text-decoration: underline; color: var(--blue-deep); }
+
+/*
+  Live-template post preview, shown in the Publish step. This mimics the real
+  Davonex post-card and article layout (post-card / pc-img / excerpt / eyebrow
+  class names and visual structure are read off the live public site) using
+  only the fabricated example content, so it shows what the pipeline's output
+  would actually look like once published on the real template, without
+  running any of the real site's code.
+*/
+.post-preview {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+.post-preview__browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--line);
+}
+.post-preview__dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--line-strong);
+}
+.post-preview__url {
+  margin-left: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.post-preview__hero {
+  height: 200px;
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-deep) 60%, var(--navy) 100%);
+  position: relative;
+}
+.post-preview__body {
+  padding: 28px 32px 32px;
+}
+.post-preview__eyebrow {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--blue);
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.post-preview__title {
+  font-size: clamp(22px, 3vw, 30px);
+  line-height: 1.2;
+  margin: 0 0 10px;
+  color: var(--navy);
+}
+.post-preview__byline {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin: 0 0 18px;
+}
+.post-preview__lede {
+  font-size: 15.5px;
+  color: var(--ink);
+  margin: 0;
+}
+.post-preview__badge {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  background: rgba(8, 21, 43, .55);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(2px);
+}

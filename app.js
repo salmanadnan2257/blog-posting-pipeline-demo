@@ -37,9 +37,9 @@ function renderImageStep(step) {
   return `
     <div class="image-placeholder">
       <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <rect x="10" y="10" width="180" height="120" rx="10" fill="#FFFDF5" stroke="#16130E" stroke-width="3"/>
-        <circle cx="60" cy="55" r="16" fill="#FFD93D" stroke="#16130E" stroke-width="2"/>
-        <path d="M20 120 L75 75 L110 100 L140 65 L190 120 Z" fill="#FF6B6B" stroke="#16130E" stroke-width="2"/>
+        <rect x="10" y="10" width="180" height="120" rx="10" fill="#FAFBFE" stroke="#062757" stroke-width="3"/>
+        <circle cx="60" cy="55" r="16" fill="#A9C9F8" stroke="#062757" stroke-width="2"/>
+        <path d="M20 120 L75 75 L110 100 L140 65 L190 120 Z" fill="#136BEE" stroke="#062757" stroke-width="2"/>
       </svg>
       <span class="image-placeholder__caption">Illustrative placeholder — the real system generates this with Gemini image generation</span>
     </div>
@@ -48,8 +48,39 @@ function renderImageStep(step) {
   `;
 }
 
+function renderPostPreview(step) {
+  const writer = DEMO_RUN.steps.find(s => s.id === "writer");
+  const lede = writer.article.intro[0];
+  const displayUrl = step.published_url.replace(/^https?:\/\//, "");
+  return `
+    <div class="post-preview">
+      <div class="post-preview__browser-bar">
+        <span class="post-preview__dot"></span>
+        <span class="post-preview__dot"></span>
+        <span class="post-preview__dot"></span>
+        <span class="post-preview__url">${escapeHtml(displayUrl)}</span>
+      </div>
+      <div class="post-preview__hero">
+        <span class="post-preview__badge">Hero image, illustrative</span>
+      </div>
+      <div class="post-preview__body">
+        <p class="post-preview__eyebrow">${escapeHtml(DEMO_RUN.business_name)} · Blog</p>
+        <h3 class="post-preview__title">${escapeHtml(DEMO_RUN.topic_title)}</h3>
+        <p class="post-preview__byline">Published just now · 7-step pipeline, fabricated run</p>
+        <p class="post-preview__lede">${escapeHtml(lede)}</p>
+      </div>
+    </div>
+    <p class="cost-note">
+      This card mirrors the real template's post layout (hero image, eyebrow, title, byline, lede) so the
+      output can be judged on presentation, not just data. It is static HTML built from the fabricated run
+      above; no request is made to any real site, and the real site's code is not part of this demo.
+    </p>
+  `;
+}
+
 function renderPublishStep(step) {
-  let html = `
+  let html = renderPostPreview(step);
+  html += `
     <div class="publish-card">
       <div><strong>Published to:</strong> <span class="publish-card__url">${escapeHtml(step.published_url)}</span></div>
       <div><strong>IndexNow:</strong> ${escapeHtml(step.indexnow_status)}</div>
