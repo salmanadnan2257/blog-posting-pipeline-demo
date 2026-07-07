@@ -49,9 +49,103 @@ function renderImageStep(step) {
 }
 
 function renderPostPreview(step) {
-  const writer = DEMO_RUN.steps.find(s => s.id === "writer");
-  const lede = writer.article.intro[0];
+  const writer = DEMO_RUN.steps.find(s => s.id === "writer").article;
+  const plan = DEMO_RUN.steps.find(s => s.id === "plan").output;
   const displayUrl = step.published_url.replace(/^https?:\/\//, "");
+  const wordCount = writer.intro.join(" ").split(/\s+/).length +
+    writer.sections.reduce((n, s) => n + s.body.replace(/<[^>]+>/g, " ").split(/\s+/).length, 0);
+  const minutes = Math.max(3, Math.round(wordCount / 200));
+
+  const brandMark = `<span class="demo-nav__mark" aria-hidden="true">NC</span>`;
+
+  const nav = `
+    <div class="pv-nav">
+      <div class="demo-nav__brand">${brandMark}<span class="demo-nav__name">Nordkast Coffee Supply</span></div>
+      <div class="pv-nav__links">
+        <a href="#" aria-current="page">Blog</a>
+        <a href="#">Shop</a>
+        <button type="button" class="btn btn--primary">Shop Coffee <span class="arr">&#8594;</span></button>
+      </div>
+    </div>
+  `;
+
+  const breadcrumb = `
+    <nav class="pv-breadcrumb" aria-label="Breadcrumb">
+      <a href="#">Home</a><span class="sep">/</span>
+      <a href="#">Blog</a><span class="sep">/</span>
+      <span aria-current="page">${escapeHtml(DEMO_RUN.topic_title)}</span>
+    </nav>
+  `;
+
+  const head = `
+    <span class="pv-post-tag">Maintenance Guide</span>
+    <h1>${escapeHtml(DEMO_RUN.topic_title)}</h1>
+    <div class="pv-meta-row">
+      <span>By Nordkast Coffee Supply</span><span class="dot"></span>
+      <span>Published just now</span><span class="dot"></span>
+      <span>${minutes} min read</span>
+    </div>
+  `;
+
+  const figure = `
+    <figure class="pv-figure">
+      <div class="image-placeholder" style="padding:0;height:220px;border-radius:var(--r-md);border-style:solid;">
+        <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="width:100%;height:100%;">
+          <rect width="200" height="140" fill="url(#pvgrad)"/>
+          <defs><linearGradient id="pvgrad" x1="0" y1="0" x2="200" y2="140"><stop offset="0" stop-color="#136BEE"/><stop offset="1" stop-color="#062757"/></linearGradient></defs>
+          <circle cx="60" cy="45" r="14" fill="#A9C9F8" opacity=".85"/>
+          <path d="M20 120 L75 70 L110 95 L140 60 L190 120 Z" fill="#0C4497" opacity=".6"/>
+        </svg>
+      </div>
+      <figcaption class="pv-figure__caption">Illustrative placeholder — the real system generates this with Gemini image generation</figcaption>
+    </figure>
+  `;
+
+  let prose = `<div class="pv-prose">`;
+  writer.intro.forEach(p => { prose += `<p>${escapeHtml(p)}</p>`; });
+  writer.sections.forEach(s => { prose += `<h2>${escapeHtml(s.header)}</h2>${s.body}`; });
+  prose += `<h2>Frequently Asked Questions</h2>`;
+  writer.faq.forEach(item => {
+    prose += `<h3>${escapeHtml(item.q)}</h3><p>${escapeHtml(item.a)}</p>`;
+  });
+  prose += `</div>`;
+
+  const refs = `
+    <div class="pv-refs">
+      <h2>References</h2>
+      <ol>
+        ${writer.sources.map(s => `<li><a href="${s.url}" target="_blank" rel="noopener">${escapeHtml(s.title)}</a>. <span class="ref-date">(${escapeHtml(s.date)})</span></li>`).join("")}
+      </ol>
+    </div>
+  `;
+
+  const author = `
+    <div class="pv-author">
+      <span class="av" aria-hidden="true">N</span>
+      <div>
+        <div class="a-name">Written by Nordkast Coffee Supply</div>
+        <div class="a-desc">We help home baristas keep their machines running clean and their shots consistent.</div>
+      </div>
+    </div>
+  `;
+
+  const finalCta = `
+    <div class="pv-final-wrap">
+      <div class="pv-final">
+        <h2>Never wonder if your machine needs a clean.</h2>
+        <p>Shop Nordkast Descale Concentrate, made for exactly this.</p>
+        <button type="button" class="btn">Shop Coffee <span class="arr">&#8594;</span></button>
+      </div>
+    </div>
+  `;
+
+  const footer = `
+    <div class="pv-foot">
+      <div class="demo-nav__brand">${brandMark}<span>Nordkast Coffee Supply</span></div>
+      <span>&copy; 2026 Nordkast Coffee Supply (fictional)</span>
+    </div>
+  `;
+
   return `
     <div class="post-preview">
       <div class="post-preview__browser-bar">
@@ -60,20 +154,23 @@ function renderPostPreview(step) {
         <span class="post-preview__dot"></span>
         <span class="post-preview__url">${escapeHtml(displayUrl)}</span>
       </div>
-      <div class="post-preview__hero">
-        <span class="post-preview__badge">Hero image, illustrative</span>
+      ${nav}
+      <div class="pv-article">
+        ${breadcrumb}
+        ${head}
+        ${figure}
+        ${prose}
+        ${refs}
+        ${author}
       </div>
-      <div class="post-preview__body">
-        <p class="post-preview__eyebrow">${escapeHtml(DEMO_RUN.business_name)} · Blog</p>
-        <h3 class="post-preview__title">${escapeHtml(DEMO_RUN.topic_title)}</h3>
-        <p class="post-preview__byline">Published just now · 7-step pipeline, fabricated run</p>
-        <p class="post-preview__lede">${escapeHtml(lede)}</p>
-      </div>
+      ${finalCta}
+      ${footer}
     </div>
     <p class="cost-note">
-      This card mirrors the real template's post layout (hero image, eyebrow, title, byline, lede) so the
-      output can be judged on presentation, not just data. It is static HTML built from the fabricated run
-      above; no request is made to any real site, and the real site's code is not part of this demo.
+      This preview is a faithful, bounded recreation of the real site's article template (same nav, breadcrumb,
+      typography, citations, references, author line, and final CTA band, built from its own live CSS), populated
+      with the fabricated run above. No request is made to any real site, and the real site's server code is not
+      part of this demo; the brand shown here ("Nordkast Coffee Supply") is invented.
     </p>
   `;
 }

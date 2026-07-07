@@ -13,10 +13,22 @@
     <strong>Demo mode</strong> — fabricated example run for illustration. No live API calls happen here; nothing shown is a real client's data.
   </div>
 
+  <nav class="demo-nav">
+    <div class="wrap demo-nav__inner">
+      <div class="demo-nav__brand">
+        <span class="demo-nav__mark" aria-hidden="true">BP</span>
+        <span class="demo-nav__name">Blog Posting Pipeline</span>
+      </div>
+      <div class="demo-nav__links">
+        <span class="demo-nav__tag">Demo</span>
+      </div>
+    </div>
+  </nav>
+
   <header class="hero">
     <div class="wrap">
-      <p class="kicker">blog-posting-pipeline / demo</p>
-      <h1>Blog Posting Pipeline</h1>
+      <p class="eyebrow">blog-posting-pipeline / demo</p>
+      <h1>See the pipeline write and publish a post</h1>
       <p class="lede">
         The real system is a production 7-step AI content pipeline that researches,
         writes, illustrates, and publishes SEO/AEO blog posts for real Digitalise
@@ -26,10 +38,10 @@
         architecture can be seen working without exposing any real client.
       </p>
       <div class="controls">
-        <button class="btn btn--primary" id="run-btn">Run the pipeline</button>
+        <button class="btn btn--primary" id="run-btn">Run the pipeline <span class="arr">&#8594;</span></button>
         <button class="btn btn--ghost" id="reset-btn" style="display:none">Reset</button>
       </div>
-      <div class="rail" id="rail"></div>
+      <div class="rail" id="rail" style="margin-top:28px"></div>
     </div>
   </header>
 
@@ -37,10 +49,19 @@
     <div id="steps"></div>
   </main>
 
-  <footer>
-    <div class="wrap">
-      This is a companion demo for a private repository. It contains no real client
-      data and makes no live API calls; every output on this page is pre-scripted.
+  <footer class="site-foot">
+    <div class="wrap foot-inner">
+      <div>
+        <div class="foot-brand">
+          <span class="demo-nav__mark" aria-hidden="true">BP</span>
+          <strong>Blog Posting Pipeline</strong>
+        </div>
+        <p class="foot-tag">This is a companion demo for a private repository. It contains no real client
+          data and makes no live API calls; every output on this page is pre-scripted.</p>
+      </div>
+      <div class="foot-right">
+        <span>Demo build, not the production system</span>
+      </div>
     </div>
   </footer>
 
