@@ -1,5 +1,5 @@
 % explainer-source-hash: 84b3faa7d375074fddbf34456fc0a24bd6fd8f43a93e709f80ad047a903d6daa
-% explainer-source-commit: cf47a30132e1d7fe8e21b690e97c240372f801d5
+% explainer-source-commit: d16a596282bd95b68bc7540eda0ade5351239223
 % explainer-generated: 2026-07-16
 % Regenerate with /explain-all (see WIRING.md). Do not edit this stamp by hand:
 % it is how the toolchain knows whether this document still matches the code.
@@ -246,7 +246,8 @@ of them starts drawing.
 
   \draw[flow] (dom) -| (p1); \draw[flow] (dom) -- (p2); \draw[flow] (dom) -| (p3);
 
-  \node[lbl, right=3mm of app, text width=30mm] {no \code{fetch}, no\\ \code{XMLHttpRequest},\\ anywhere};
+  \node[lbl, right=3mm of app, text width=30mm, font=\scriptsize]
+    {no network call\\ of any kind,\\ anywhere};
 \end{tikzpicture}}
 \caption{The entire architecture. \file{demo-data.js} must load before \file{app.js},
 because \file{app.js} reads its constants at the moment the page finishes parsing.}
@@ -306,8 +307,12 @@ provenance ladder from Section~\ref{sec:ladder} shows up here as a separate stru
     {\scriptsize business\_name, topic\_title,\\ hero\_image,\\ \textbf{steps[7]} (one per stage)};
 
   \draw[flow] (real) -- (realf); \draw[flow] (presets) -- (presetf); \draw[flow] (runs) -- (runf);
-  \draw[dflow] (presetf.west) to[out=180,in=0] node[lbl, above] {modeledAfter\\ resolves to} (realf.east);
-  \draw[dflow] (presetf.east) to[out=0,in=180] node[lbl, above] {id\\ selects} (runf.west);
+
+  % Cross-references routed well below the field boxes so no label lands on a box.
+  \draw[dflow] ([xshift=-10mm]presetf.south) -- ++(0,-10mm) -| (realf.south);
+  \draw[dflow] ([xshift=10mm]presetf.south) -- ++(0,-16mm) -| (runf.south);
+  \node[lbl, below=9mm of presetf, xshift=-30mm] {\code{modeledAfter} $\rightarrow$ slug of a real post};
+  \node[lbl, below=15mm of presetf, xshift=32mm] {\code{id} $\rightarrow$ key into \code{DEMO\_RUNS}};
 \end{tikzpicture}}
 \caption{The three constants and how they reference each other. \code{PRESETS} is the join
 table: it links a fabricated run to the real post whose shape inspired it.}
@@ -383,9 +388,10 @@ system's architecture}. That claim is checkable, and it checks out.
   \draw[flow] (s1) -- (s2); \draw[flow] (s2) -- (s3); \draw[flow] (s3) -- (s4);
   \draw[flow] (s4) -- (s5); \draw[flow] (s5) -- (s6); \draw[flow] (s6) -- (s7);
 
-  \node[extbox, above=9mm of s2, text width=30mm] (res) {\scriptsize AEO/SEO research\\ (Perplexity)\\ \scriptsize \textit{unnumbered stage}};
+  \node[extbox, above=11mm of s2, text width=30mm] (res) {\scriptsize AEO/SEO research\\ (Perplexity)\\ \scriptsize \textit{unnumbered stage}};
+  % Route in from the left and straight down, so no line crosses the box itself.
   \draw[dflow] (s1.north) |- (res.west);
-  \draw[dflow] (res.east) -| (s2.north);
+  \draw[dflow] (res.south) -- (s2.north);
 
   \node[extbox, below=9mm of s4, text width=34mm] (tools) {\scriptsize Tool 1: internal-link search\\ Tool 2: per-subtopic research};
   \draw[dflow] (tools) -- (s4);
@@ -533,7 +539,8 @@ screen.
   \draw[flow] (reveal) -- (more);
   \draw[flow] (more) -- node[lbl, above] {no} (done);
   \draw[flow] (more.south) |- ++(0,-9mm) -| node[lbl, pos=0.25, below] {yes: \code{setTimeout(next, 900)}} (reveal.south);
-  \draw[dflow] (done.north) |- ++(0,9mm) -| node[lbl, pos=0.25, above] {click ``Reset''} (idle.north);
+  % Reset path routed around the outside on the left, clear of both boxes.
+  \draw[dflow] (done.west) -- ++(-9mm,0) |- node[lbl, pos=0.25, left, text width=17mm] {click\\ ``Reset''} (idle.west);
 \end{tikzpicture}}
 \caption{The run loop. All seven steps already exist in the DOM before the button is
 pressed; ``running'' only adds a CSS class to one more of them every 900 ms.}
@@ -577,7 +584,9 @@ grid of fifteen real ones, with a live countdown, for fifteen minutes.
   \draw[flow] (none) -- (fin);
   \draw[flow] (fin) -- (live);
   \draw[flow] (live) -- (again);
-  \draw[flow] (again) -- node[lbl, above] {yes: clear both\\ handles, restart} ($(live.south)+(0,-5mm)$);
+  % "yes" loops back to Card live around the right, clear of the arrow beneath it.
+  \draw[flow] (again.east) -- ++(10mm,0) |- node[lbl, pos=0.25, right, text width=21mm]
+    {yes: clear both\\ handles, restart} (live.east);
   \draw[flow] (again.west) -- node[lbl, above] {no: 15 min elapse} (expire.east);
   \draw[flow] (expire) -- (none);
   \node[lbl, above=1mm of live, text width=44mm] {every tick rebuilds the \textbf{whole} grid,\\ all 16 cards, not just the ribbon};
