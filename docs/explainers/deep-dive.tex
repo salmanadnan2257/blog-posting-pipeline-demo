@@ -1,0 +1,953 @@
+% explainer-source-hash: 84b3faa7d375074fddbf34456fc0a24bd6fd8f43a93e709f80ad047a903d6daa
+% explainer-source-commit: cf47a30132e1d7fe8e21b690e97c240372f801d5
+% explainer-generated: 2026-07-16
+% Regenerate with /explain-all (see WIRING.md). Do not edit this stamp by hand:
+% it is how the toolchain knows whether this document still matches the code.
+\documentclass[11pt,a4paper]{article}
+\input{preamble}
+
+\title{\vspace{-1.4cm}Blog Posting Pipeline: Demo\\[4pt]
+\large A Deep Dive into a Fabricated Walkthrough of a Private System}
+\author{Explainer for \file{blog-posting-pipeline-demo}}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\begin{honest}{Read this box before anything else}
+This project is \textbf{not} an AI content pipeline. It is a static web page that
+\emph{pretends} to be one, on purpose, and says so on every screen.
+
+The real system, \file{blog-posting-pipeline}, is private. This repository is its public
+stand-in: a hand-written script of invented example runs for an invented company, replayed
+in a browser so that a reader can see the shape of the real architecture without the real
+system being exposed. Nothing this page ``generates'' was generated. No model is called. No
+network request is made. Every number it shows for a run was typed into a JavaScript file
+by hand.
+
+One part of it \emph{is} real, and that distinction is the whole point of the project:
+the ``Blog Library'' tab holds fifteen genuine, already-published articles from a real
+client site. Those were produced by the real pipeline. They are evidence. The scripted runs
+sitting next to them are not.
+\end{honest}
+
+\tableofcontents
+\newpage
+
+\section{What this project is, and what it is not}
+
+\subsection{The one-sentence version}
+
+\begin{keyidea}{The project in one sentence}
+A single-page, no-backend website that steps a reader through the seven stages of a private
+production content pipeline, using fabricated example data for an invented coffee brand,
+displayed alongside fifteen real published articles that the private pipeline actually
+produced.
+\end{keyidea}
+
+\subsection{Three things it is not}
+
+Because the page is designed to \emph{look} like a working system, it is worth stating the
+negatives explicitly and early.
+
+\begin{itemize}
+  \item \textbf{It is not the pipeline.} No part of the real system's code is in this
+    repository. There is no Python, no prompt template, no client configuration, no
+    scheduler, no API integration. The seven stages exist here only as text describing
+    seven stages.
+  \item \textbf{It is not a live demo.} Clicking ``Run the pipeline'' does not run
+    anything. It reveals pre-written text on a timer. This is verified, not assumed: see
+    Section~\ref{sec:verify}, where the page was driven in a real browser and made zero
+    network requests.
+  \item \textbf{It is not client work on display.} The runs are for ``Nordkast Coffee
+    Supply,'' a brand that does not exist. The only real client work here is the fifteen
+    library articles, which were already public before this repository existed.
+\end{itemize}
+
+\begin{jargon}{Static site}
+A website made only of files that a server hands over unchanged: HTML (the content), CSS
+(the appearance), JavaScript (the behaviour), and images. There is no program running on a
+server that builds a response when you visit. Everything that happens, happens inside your
+browser. That is why this demo can make no live calls: there is nothing on the other end to
+call.
+\end{jargon}
+
+\begin{jargon}{Pipeline}
+A program built as a chain of stages, where each stage's output is the next stage's input.
+The real system's chain is: decide a topic, pick keywords, plan sections, write the article,
+describe an image, make the image, publish it. Seven links in a chain.
+\end{jargon}
+
+\section{Why a demo exists at all}
+
+\subsection{The problem it solves}
+
+The owner has a production system that writes and publishes marketing articles for paying
+clients. He would like to show it to hiring panels. He cannot: per the project's own README,
+the pipeline \emph{is} the agency's product, so its source is the business, not merely data
+that could be scrubbed clean and released.
+
+That leaves an awkward gap. ``Trust me, I built a seven-stage AI pipeline'' is not evidence.
+A screenshot is barely better. So this repository answers a narrower question: can the
+\emph{architecture} be shown honestly, in a form someone can click, without showing the
+implementation?
+
+\begin{keyidea}{The trade being made}
+Give up all of the real system's substance (the prompts, the client rules, the code) and
+keep only its \emph{shape} (seven stages, in order, with the right kind of data moving
+between them). Then be relentless about labelling the difference, because a convincing
+demo is exactly the thing most likely to be mistaken for the real product.
+\end{keyidea}
+
+\subsection{The honesty problem this creates}
+
+A fabricated demo that looks real is a liability unless the disclosure is impossible to
+miss. The repository takes this seriously and in several places overshoots into a defect,
+which Section~\ref{sec:honest} covers. The disclosure appears in at least six places:
+
+\begin{itemize}
+  \item A permanent banner pinned across the top of the page, not dismissable.
+  \item The page's introductory paragraph.
+  \item The footer.
+  \item A ribbon on the fabricated article card, separate from the banner.
+  \item Captions under every photo and under the cost table.
+  \item Comment headers at the top of every source file.
+\end{itemize}
+
+\section{The provenance ladder}
+\label{sec:ladder}
+
+This is the most interesting idea in the project, and the thing worth defending in an
+interview. The page mixes content of three completely different origins in the same
+interface. Getting them confused would be the failure mode, so each tier is handled by a
+different mechanism and labelled differently.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=6mm]
+  \node[box, fill=warnred!12, draw=warnred, text width=48mm, minimum height=17mm] (t1)
+    {\textbf{Tier 1: Fabricated}\\[2pt]\footnotesize The three example runs.\\
+     Invented brand, invented\\ topics, hand-typed outputs.};
+  \node[box, text width=48mm, minimum height=17mm, right=10mm of t1] (t2)
+    {\textbf{Tier 2: Real, third party}\\[2pt]\footnotesize Three stock photos\\
+     standing in for the image step.\\ Open licences, not the owner's.};
+  \node[box, fill=okgreen!12, draw=okgreen, text width=48mm, minimum height=17mm, right=10mm of t2] (t3)
+    {\textbf{Tier 3: Real, the client's}\\[2pt]\footnotesize Fifteen published articles\\
+     the real pipeline produced.\\ Already public before this repo.};
+
+  \node[extbox, text width=48mm, below=8mm of t1] (m1)
+    {\footnotesize Banner + ribbon + ``fictional''\\ in the brand name itself};
+  \node[extbox, text width=48mm, below=8mm of t2] (m2)
+    {\footnotesize Caption on every image:\\ ``real stock photo, not\\ AI-generated'' + CREDITS.md};
+  \node[extbox, text width=48mm, below=8mm of t3] (m3)
+    {\footnotesize Provenance footer linking\\ back to the original URL\\ + CREDITS.md};
+
+  \draw[flow] (t1) -- (m1); \draw[flow] (t2) -- (m2); \draw[flow] (t3) -- (m3);
+
+  \node[lbl, below=4mm of m1] {labelled as invented};
+  \node[lbl, below=4mm of m2] {labelled as a stand-in};
+  \node[lbl, below=4mm of m3] {labelled as genuine};
+
+  \begin{scope}[on background layer]
+    \node[fit=(t1)(t3)(m1)(m3), draw=linegrey, fill=softgrey, rounded corners=3pt,
+          inner sep=6mm] (bg) {};
+  \end{scope}
+  \node[anchor=north west, font=\small\itshape, text=inkblue] at (bg.north west)
+    {\hspace{2mm}\raisebox{-3mm}{Three origins, one page, three different disclosure mechanisms}};
+\end{tikzpicture}}
+\caption{The provenance ladder. The design problem is not ``is this labelled?'' but ``is
+each \emph{kind} of content labelled in a way that survives being seen out of context?''}
+\end{figure}
+
+\begin{keyidea}{Why tier 3 is the clever part}
+The tempting design is to invent a fake blog library too, so that everything on the page is
+uniformly fictional and no disclosure question arises. The project rejects that. Its
+reasoning, from the README: the real client's posts are already public, the real pipeline
+genuinely produced them, so reproducing them (with a link back to the original) is
+\emph{more} honest than inventing a fake library, because it is the only actual evidence on
+the page that the pipeline ships anything at all.
+
+The cost of that choice is the risk this whole document is about: real and fake now sit
+side by side in one grid, and the labelling has to carry the entire burden.
+\end{keyidea}
+
+\section{Repository layout}
+
+Four hand-written source files, one of which is almost entirely data, plus assets.
+
+\begin{figure}[H]
+\centering
+\begin{forest} dirtree
+[blog-posting-pipeline-demo
+  [index.html {\rmfamily\itshape\, 108 lines: page skeleton, banner, three panels}]
+  [styles.css {\rmfamily\itshape\, 454 lines: design tokens copied from the live client site}]
+  [demo-data.js {\rmfamily\itshape\, 687 lines / 231 KB: all the content, no logic}]
+  [app.js {\rmfamily\itshape\, 458 lines: all the logic, no content}]
+  [netlify.toml {\rmfamily\itshape\, 2 lines: ``publish this folder as-is''}]
+  [LICENSE {\rmfamily\itshape\, PolyForm Strict (look, do not reuse)}]
+  [README.md]
+  [{favicon.svg, favicon.png}]
+  [assets/
+    [fonts/
+      [space-grotesk.woff2 {\rmfamily\itshape\, bundled, so no font CDN is called}]
+    ]
+    [images/ {\rmfamily\itshape\, 3 stock photos for the fabricated runs}
+      [CREDITS.md {\rmfamily\itshape\, licence + author + change made, per photo}]
+    ]
+    [posts/ {\rmfamily\itshape\, 15 real hero images from the client site}
+      [CREDITS.md {\rmfamily\itshape\, why reproducing real client work is disclosed here}]
+    ]
+  ]
+  [docs/explainers/ {\rmfamily\itshape\, this document}]
+]
+\end{forest}
+\caption{The whole repository. Note the split: \file{demo-data.js} is content with no
+behaviour, \file{app.js} is behaviour with no content.}
+\end{figure}
+
+\begin{jargon}{Asset}
+Any supporting file a page needs that is not code: an image, a font, a video. Kept in an
+\file{assets/} folder by near-universal convention.
+\end{jargon}
+
+\begin{jargon}{WOFF2 and WebP}
+Compressed file formats for the web. WOFF2 holds a font (here, the typeface ``Space
+Grotesk''); WebP holds an image, at roughly half the size of an equivalent JPEG. Both are
+bundled locally rather than loaded from someone else's server, which is what lets the page
+claim it makes no outside requests.
+\end{jargon}
+
+\section{Architecture}
+
+There is no server, no framework, and no build step. The browser loads three files and one
+of them starts drawing.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=8mm]
+  \node[box, text width=30mm] (html) {\file{index.html}\\[2pt]\scriptsize empty panels,\\ banner, tab buttons};
+  \node[store, right=16mm of html, text width=26mm] (data) {\file{demo-data.js}\\[2pt]\scriptsize 3 constants};
+  \node[box, right=16mm of data, text width=30mm] (app) {\file{app.js}\\[2pt]\scriptsize renderers + state};
+  \node[extbox, above=8mm of data, text width=30mm] (css) {\file{styles.css}\\[2pt]\scriptsize tokens from the\\ real client site};
+
+  \draw[flow] (html) -- node[lbl, above] {loads\\ 1st} (data);
+  \draw[flow] (data) -- node[lbl, above] {loads\\ 2nd} (app);
+  \draw[dflow] (css) -- (html);
+
+  \node[dec, below=12mm of data, text width=20mm] (dom) {DOM\\ writes};
+  \draw[flow] (app.south) |- ++(0,-6mm) -| (dom.north);
+
+  \node[box, below=12mm of dom, xshift=-46mm, text width=32mm] (p1) {Panel 1\\ \scriptsize ``Run the pipeline''};
+  \node[box, below=12mm of dom, text width=32mm] (p2) {Panel 2\\ \scriptsize ``Blog Library''};
+  \node[box, below=12mm of dom, xshift=46mm, text width=32mm] (p3) {Panel 3\\ \scriptsize article reader};
+
+  \draw[flow] (dom) -| (p1); \draw[flow] (dom) -- (p2); \draw[flow] (dom) -| (p3);
+
+  \node[lbl, right=3mm of app, text width=30mm] {no \code{fetch}, no\\ \code{XMLHttpRequest},\\ anywhere};
+\end{tikzpicture}}
+\caption{The entire architecture. \file{demo-data.js} must load before \file{app.js},
+because \file{app.js} reads its constants at the moment the page finishes parsing.}
+\end{figure}
+
+\begin{jargon}{DOM (Document Object Model)}
+The browser's live, in-memory model of the page, shaped like a tree: the page contains a
+body, the body contains sections, a section contains a heading and paragraphs. JavaScript
+changes what you see by editing this tree. ``Writing to the DOM'' means changing the page
+in front of you.
+\end{jargon}
+
+\begin{jargon}{Vanilla JavaScript}
+JavaScript with no framework (no React, no Vue). The programmer manipulates the DOM
+directly. For a page this small it removes an entire build toolchain; the cost is that
+patterns a framework gives free, such as updating only the part of the page that changed,
+must be written by hand, and here one of them was not (Section~\ref{sec:honest}).
+\end{jargon}
+
+\subsection{The load-order dependency}
+
+At the bottom of \file{index.html}:
+
+\begin{lstlisting}[language=HTML]
+<script src="demo-data.js"></script>
+<script src="app.js"></script>
+\end{lstlisting}
+
+Ordinary script tags, no \code{defer} or \code{async}, so the browser runs them in written
+order. \file{demo-data.js} declares three constants at the top level of the page's shared
+scope; \file{app.js} then reads them by name. Swap the two lines and the page breaks
+immediately, because \file{app.js} evaluates \code{PRESETS[0].id} while assigning its own
+first variable. This is a real, if conventional, coupling: the files communicate through
+global names rather than through any import mechanism.
+
+\section{The data layer: \file{demo-data.js}}
+
+231 KB across 687 lines, holding three constants and no functions. Every line of the
+provenance ladder from Section~\ref{sec:ladder} shows up here as a separate structure.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.92\textwidth}{!}{
+\begin{tikzpicture}[node distance=7mm]
+  \node[store, text width=40mm, fill=okgreen!8, draw=okgreen] (real)
+    {\code{REAL\_DAVONEX\_POSTS}\\[3pt]\scriptsize an array of 15\\ \scriptsize \textbf{real} published posts};
+  \node[store, text width=40mm, right=14mm of real] (presets)
+    {\code{PRESETS}\\[3pt]\scriptsize an array of 3\\ \scriptsize chip labels};
+  \node[store, text width=40mm, right=14mm of presets, fill=warnred!8, draw=warnred] (runs)
+    {\code{DEMO\_RUNS}\\[3pt]\scriptsize a map of 3\\ \scriptsize \textbf{fabricated} runs};
+
+  \node[extbox, below=10mm of real, text width=42mm, align=left] (realf)
+    {\scriptsize slug, title, excerpt, by,\\ date, read\_time, image,\\ \textbf{body\_html} (7.4k to 15k chars),\\ references[]};
+  \node[extbox, below=10mm of presets, text width=42mm, align=left] (presetf)
+    {\scriptsize id $\rightarrow$ keys into DEMO\_RUNS\\ chip $\rightarrow$ button label\\ modeledAfter $\rightarrow$ slug of a\\ real post, or null};
+  \node[extbox, below=10mm of runs, text width=42mm, align=left] (runf)
+    {\scriptsize business\_name, topic\_title,\\ hero\_image,\\ \textbf{steps[7]} (one per stage)};
+
+  \draw[flow] (real) -- (realf); \draw[flow] (presets) -- (presetf); \draw[flow] (runs) -- (runf);
+  \draw[dflow] (presetf.west) to[out=180,in=0] node[lbl, above] {modeledAfter\\ resolves to} (realf.east);
+  \draw[dflow] (presetf.east) to[out=0,in=180] node[lbl, above] {id\\ selects} (runf.west);
+\end{tikzpicture}}
+\caption{The three constants and how they reference each other. \code{PRESETS} is the join
+table: it links a fabricated run to the real post whose shape inspired it.}
+\end{figure}
+
+\subsection{\code{REAL\_DAVONEX\_POSTS}: the evidence}
+
+Fifteen objects, each a faithful copy of a genuine published article: its title, excerpt,
+date, read time, a locally stored hero image, its full article body as HTML (between 7,358
+and 15,078 characters; roughly 154,000 characters in total, which is most of this file's
+size), and its reference list.
+
+This is a \emph{snapshot}, taken 2026-07-07 and frozen. It is not fetched. The README is
+candid that this is the design's weak point: a real client publishes continuously, so the
+snapshot drifts out of date the moment it is taken, and the project accepted that rather
+than add the one live request that would break the ``no network calls'' guarantee.
+
+\begin{jargon}{Snapshot}
+A copy of data taken at one instant and then kept, rather than re-read from the source each
+time. Fast and dependency-free; always at risk of being stale.
+\end{jargon}
+
+\begin{jargon}{Slug}
+The human-readable identifier in a web address. In
+\code{davonex.com/blog/what-is-answer-engine-optimization-for-e-commerce-2026/}, the long
+hyphenated part is the slug. Here it doubles as each post's primary key.
+\end{jargon}
+
+\subsection{\code{DEMO\_RUNS}: the fabrication}
+
+Three runs, keyed by id, each with exactly seven step objects. Each step carries an
+\code{id}, a display number such as \code{1 / 7}, a title, a model name, and a \code{type}
+that tells \file{app.js} which renderer to use. The \code{type} field is the dispatch key
+of the whole rendering layer:
+
+\begin{center}
+\begin{tabular}{@{}llp{72mm}@{}}
+\toprule
+\textbf{\code{type}} & \textbf{Used by} & \textbf{Renders as} \\
+\midrule
+\code{json} & steps 1, 2, 3 & a formatted, indented JSON block \\
+\code{article} & step 4 & the assembled article: intro, sections, FAQ, references \\
+\code{text} & step 5 & a single quoted paragraph (the image prompt) \\
+\code{image} & step 6 & a stock photo plus a usage block \\
+\code{publish} & step 7 & the full site preview plus a cost table \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{jargon}{JSON (JavaScript Object Notation)}
+A plain-text format for structured data, built from name/value pairs, lists, and nesting.
+It is how the real system's stages hand results to each other, and showing it raw is the
+demo's way of saying ``a machine consumed this, not a human.''
+\end{jargon}
+
+\section{The seven stages}
+
+The rail of seven labels across the top is the demo's central claim: \emph{this is the real
+system's architecture}. That claim is checkable, and it checks out.
+
+\begin{figure}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[node distance=4mm]
+  \node[box, text width=21mm, minimum height=13mm] (s1) {\textbf{1. Brief}\\[1pt]\scriptsize topic +\\ description};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s1] (s2) {\textbf{2. Keywords}\\[1pt]\scriptsize + central\\ statements};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s2] (s3) {\textbf{3. Section}\\ \textbf{plan}\\[1pt]\scriptsize sub-topics};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s3] (s4) {\textbf{4. Writer}\\[1pt]\scriptsize agentic,\\ 2 tools};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s4] (s5) {\textbf{5. Image}\\ \textbf{prompt}};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s5] (s6) {\textbf{6. Image}\\[1pt]\scriptsize hero render};
+  \node[box, text width=21mm, minimum height=13mm, right=6mm of s6] (s7) {\textbf{7. Publish}\\[1pt]\scriptsize + IndexNow\\ + Sheets};
+
+  \draw[flow] (s1) -- (s2); \draw[flow] (s2) -- (s3); \draw[flow] (s3) -- (s4);
+  \draw[flow] (s4) -- (s5); \draw[flow] (s5) -- (s6); \draw[flow] (s6) -- (s7);
+
+  \node[extbox, above=9mm of s2, text width=30mm] (res) {\scriptsize AEO/SEO research\\ (Perplexity)\\ \scriptsize \textit{unnumbered stage}};
+  \draw[dflow] (s1.north) |- (res.west);
+  \draw[dflow] (res.east) -| (s2.north);
+
+  \node[extbox, below=9mm of s4, text width=34mm] (tools) {\scriptsize Tool 1: internal-link search\\ Tool 2: per-subtopic research};
+  \draw[dflow] (tools) -- (s4);
+
+  \node[lbl, below=3mm of s1, text width=24mm] {pro model};
+  \node[lbl, below=3mm of s2, text width=24mm] {pro model};
+  \node[lbl, below=3mm of s3, text width=24mm] {flash model};
+  \node[lbl, below=3mm of s5, text width=24mm] {flash model};
+  \node[lbl, below=3mm of s6, text width=24mm] {image model};
+  \node[lbl, below=3mm of s7, text width=24mm] {no model};
+\end{tikzpicture}}
+\caption{The seven stages as the demo presents them. The unnumbered research stage between
+1 and 2 is not on the demo's visible rail, but it does appear as a line in the demo's cost
+table, which is a small and creditable piece of fidelity.}
+\end{figure}
+
+\begin{keyidea}{Architectural fidelity: verified}
+The demo's seven stages were compared against the real private project's own
+documentation. The stage names, their order, which stage uses the expensive ``pro'' model
+against the cheap ``flash'' model, the specific model identifiers, the fact that stage 4 is
+an agentic loop with exactly two tools, the unnumbered research stage between stages 1 and
+2, and the publish stage's trio of actions (assemble, ping IndexNow, append a reporting
+row) all match.
+
+This is the demo's strongest result. Its architectural claim is not marketing. It is
+accurate. The private details behind each stage are deliberately not reproduced here.
+\end{keyidea}
+
+\begin{jargon}{Agentic loop}
+An arrangement where the language model is not asked one question and answered once.
+Instead it is given a set of \emph{tools} it may call, and it loops: think, call a tool,
+read the result, think again, until it decides it is done. Stage 4's two tools search the
+client's own site for internal links, and research each sub-topic. This is why stage 4 is
+by far the most expensive line in the cost table.
+\end{jargon}
+
+\begin{jargon}{SEO and AEO}
+SEO (Search Engine Optimization) is shaping a page so a search engine ranks it highly and
+a human clicks the link. AEO (Answer Engine Optimization) is shaping a page so an AI
+assistant that answers the question \emph{directly} cites your page as its source. The
+distinction matters commercially: with AEO there may be no click at all, so the goal shifts
+from ranking to being extractable and quotable.
+\end{jargon}
+
+\begin{jargon}{IndexNow}
+A protocol for telling search engines ``this URL just changed, come look now,'' rather than
+waiting for them to notice. One HTTP request. The demo shows this stage's status as
+\code{not sent (demo)}.
+\end{jargon}
+
+\begin{jargon}{Pinecone and embeddings}
+An \emph{embedding} turns a piece of text into a long list of numbers positioned so that
+texts with similar meaning end up near each other. Pinecone is a database built to search
+those lists by nearness rather than by exact keyword. The real system uses it to remember
+what it has already written about, so it does not repeat an angle, and to find internal
+links. The demo only names it, in a cost row.
+\end{jargon}
+
+\section{The logic layer: \file{app.js}}
+
+458 lines, no dependencies, organized as five labelled sections: step renderers, preset
+autofill, the pipeline run, the blog library, and tab switching, then an initializer.
+
+\subsection{Rendering by string concatenation}
+
+Every renderer builds an HTML string and assigns it to an element's \code{innerHTML}. There
+is no templating library and no virtual DOM. \code{renderStep} is the dispatcher:
+
+\begin{lstlisting}
+function renderStep(run, step) {
+  let body = "";
+  if (step.type === "json") {
+    if (step.input) body += `<p><strong>Input</strong></p>${renderJsonPanel(step.input)}...`;
+    body += renderJsonPanel(step.output);
+  } else if (step.type === "article") {
+    body = renderArticle(step.article);
+  } else if (step.type === "text") {
+    body = `<p class="image-prompt">${escapeHtml(step.output)}</p>`;
+  } else if (step.type === "image") {
+    body = renderImageStep(run, step);
+  } else if (step.type === "publish") {
+    body = renderPublishStep(run, step);
+  }
+  ...
+}
+\end{lstlisting}
+
+\begin{jargon}{innerHTML}
+A property of every element in the DOM. Read it and you get the element's contents as HTML
+text; \emph{assign} to it and the browser discards everything inside that element and
+builds the new contents from scratch. It is the quickest way to draw a chunk of page, and
+the reason for two of the defects in Section~\ref{sec:honest}: it destroys, it does not
+update.
+\end{jargon}
+
+\subsection{The escaping story, and where it stops}
+
+The file defines a small guard:
+
+\begin{lstlisting}
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+\end{lstlisting}
+
+\begin{jargon}{Escaping, and why it exists}
+If a chunk of text contains \code{<script>} and you paste it straight into a page, the
+browser will treat it as an instruction rather than as words. Escaping rewrites the
+dangerous characters into harmless stand-ins (\code{<} becomes \code{\&lt;}) so they are
+\emph{displayed} rather than \emph{executed}. Skipping it is the root of the cross-site
+scripting (XSS) class of bugs.
+\end{jargon}
+
+It is applied to titles, prompts and FAQ text. It is deliberately \emph{not} applied to
+authored HTML: \code{section.body} and \code{post.body\_html} are injected raw, which is
+necessary, since those fields contain the tables and lists that are the whole point. The
+data is hand-written and static, so nothing hostile can reach it. Two observations remain,
+in Section~\ref{sec:honest}: the function does not escape quote characters, yet its output
+is dropped into HTML attributes, and the same data is escaped in one renderer and not in
+another.
+
+\subsection{The run: a timer, not a state machine}
+
+\code{runPipeline} is the function behind the button. It is worth reading closely because
+it is the demo's only real piece of control flow, and it is much simpler than it appears on
+screen.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{
+\begin{tikzpicture}[node distance=9mm]
+  \node[box] (idle) {\textbf{Idle}\\[1pt]\scriptsize 7 steps in the DOM,\\ 0 visible};
+  \node[dec, right=14mm of idle, text width=17mm] (click) {click\\ ``Run''};
+  \node[box, right=14mm of click, text width=32mm] (lock) {\textbf{Locked}\\[1pt]\scriptsize run button disabled,\\ preset chips disabled};
+  \node[box, below=11mm of lock, text width=36mm] (reveal) {\textbf{Reveal step $i$}\\[1pt]\scriptsize add \code{is-visible},\\ mark rail dot,\\ scroll into view};
+  \node[dec, left=14mm of reveal, text width=19mm] (more) {$i < 7$?};
+  \node[box, left=14mm of more, text width=32mm] (done) {\textbf{Complete}\\[1pt]\scriptsize show Reset,\\ re-enable chips,\\ \code{addToLibrary()}};
+
+  \draw[flow] (idle) -- (click);
+  \draw[flow] (click) -- (lock);
+  \draw[flow] (lock) -- (reveal);
+  \draw[flow] (reveal) -- (more);
+  \draw[flow] (more) -- node[lbl, above] {no} (done);
+  \draw[flow] (more.south) |- ++(0,-9mm) -| node[lbl, pos=0.25, below] {yes: \code{setTimeout(next, 900)}} (reveal.south);
+  \draw[dflow] (done.north) |- ++(0,9mm) -| node[lbl, pos=0.25, above] {click ``Reset''} (idle.north);
+\end{tikzpicture}}
+\caption{The run loop. All seven steps already exist in the DOM before the button is
+pressed; ``running'' only adds a CSS class to one more of them every 900 ms.}
+\end{figure}
+
+Two consequences follow from that design, and both are worth being able to state out loud:
+
+\begin{itemize}
+  \item \textbf{The run cannot fail}, because nothing is computed. There is no error state
+    in the diagram because there is no operation that could error. The real system's
+    failure modes (a refusal, a timeout, a malformed JSON reply, a publish rejection) have
+    no representation here at all.
+  \item \textbf{The whole article is in the page from the start.} ``Run the pipeline''
+    reveals text the browser already holds. Anyone who opens the developer tools before
+    clicking sees the finished post. This is not hidden and does not pretend otherwise, but
+    it is the literal meaning of ``scripted.''
+\end{itemize}
+
+\begin{jargon}{setTimeout}
+A browser function meaning ``call this function once, after $N$ milliseconds.'' Chaining it
+to itself, as \code{next()} does, produces a sequence of delayed steps. Its sibling
+\code{setInterval} means ``call this repeatedly, every $N$ milliseconds, forever, until
+cancelled.''
+\end{jargon}
+
+\subsection{The library card lifecycle}
+
+Finishing a run calls \code{addToLibrary}, which puts one fabricated card at the top of the
+grid of fifteen real ones, with a live countdown, for fifteen minutes.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.95\textwidth}{!}{
+\begin{tikzpicture}[node distance=10mm]
+  \node[box, text width=30mm] (none) {\textbf{No demo card}\\[1pt]\scriptsize \code{libraryDemo = null}\\ \scriptsize grid shows 15};
+  \node[dec, right=15mm of none, text width=20mm] (fin) {run\\ completes};
+  \node[box, right=15mm of fin, text width=38mm] (live) {\textbf{Card live}\\[1pt]\scriptsize \code{libraryDemo} set\\ \code{setInterval} 1 s $\rightarrow$ redraw\\ \code{setTimeout} 15 min $\rightarrow$ expire};
+  \node[dec, below=11mm of live, text width=22mm] (again) {run again\\ before\\ expiry?};
+  \node[box, below=11mm of none, text width=34mm] (expire) {\textbf{Expired}\\[1pt]\scriptsize \code{libraryDemo = null},\\ grid redrawn to 15};
+
+  \draw[flow] (none) -- (fin);
+  \draw[flow] (fin) -- (live);
+  \draw[flow] (live) -- (again);
+  \draw[flow] (again) -- node[lbl, above] {yes: clear both\\ handles, restart} ($(live.south)+(0,-5mm)$);
+  \draw[flow] (again.west) -- node[lbl, above] {no: 15 min elapse} (expire.east);
+  \draw[flow] (expire) -- (none);
+  \node[lbl, above=1mm of live, text width=44mm] {every tick rebuilds the \textbf{whole} grid,\\ all 16 cards, not just the ribbon};
+\end{tikzpicture}}
+\caption{The demo card's lifetime. The re-run path is handled correctly: both the interval
+and the timeout are cancelled before new ones are created, so timers cannot leak.}
+\end{figure}
+
+The cleanup is genuinely careful, and worth crediting:
+
+\begin{lstlisting}
+function addToLibrary(runId) {
+  if (libraryDemo) {
+    clearInterval(libraryDemo.tickHandle);
+    clearTimeout(libraryDemo.timeoutHandle);
+  }
+  ...
+}
+\end{lstlisting}
+
+Without those two lines, running the pipeline three times would leave three intervals all
+redrawing the same grid every second, and three timeouts racing to delete a card. The
+author saw that. What the author did not see is what the interval does each time it fires,
+which is the subject of the next section.
+
+\section{What I verified by running it}
+\label{sec:verify}
+
+The claims below were not taken on trust. The page was loaded in a real headless Chrome,
+driven through a full run, and instrumented.
+
+\begin{center}
+\begin{tabular}{@{}p{62mm}p{28mm}p{42mm}@{}}
+\toprule
+\textbf{Claim} & \textbf{Result} & \textbf{How it was checked} \\
+\midrule
+``No live API calls happen here'' & \textbf{True} & Every network request the page made was
+recorded. Requests to non-local origins: \textbf{zero}. \\
+No \code{fetch} or \code{XMLHttpRequest} in the source & \textbf{True} & Searched both JS
+files. No network API appears at all. \\
+Fonts and images are local & \textbf{True} & The only \code{url()} in the CSS is the bundled
+WOFF2. No external stylesheet or CDN. \\
+The page is free of JS errors & \textbf{True} & Zero page errors and zero console errors
+across load, a full run, and opening a post. \\
+Seven stages step through & \textbf{True} & 7 steps in the DOM, 0 visible before the click,
+7 visible and 7 rail dots marked done after. \\
+``All 15 real posts'' & \textbf{True} & 15 entries, 15 image files, every referenced path
+exists, no orphans. \\
+A run adds exactly one demo card & \textbf{True} & Tab counter went from (15) to (16); one
+card carries the ribbon. \\
+The countdown is live & \textbf{True} & Ribbon read 14:58, then 14:56 after 2.2 seconds. \\
+Reader shows the real post + provenance & \textbf{True} & 5{,}545 characters of prose, and
+a link back to the genuine original URL. \\
+Cost range matches the real system & \textbf{Partly false} & See
+Section~\ref{sec:honest}. Only one of the three presets matches. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keyidea}{The headline verification result}
+The demo's central promise, that it is inert and self-contained, is true, and provably so.
+Driven through its entire flow in a real browser, the page issued \textbf{no network
+requests whatsoever} and raised no errors. Every asset it needs is in the repository.
+\end{keyidea}
+
+\section{Honest findings}
+\label{sec:honest}
+
+\subsection{The cost claim is wrong for two of the three presets}
+
+This is the most serious finding in the project and the one most likely to be caught by an
+interviewer who reads carefully.
+
+Under the cost table, on every run, the page prints:
+
+\begin{quote}\itshape
+``The total range is the real, published per-post cost for the production system (see its
+README). The per-step line items above are illustrative for this demo and are not the exact
+real breakdown.''
+\end{quote}
+
+The second sentence is a good disclosure. The first sentence is a claim of fact, and it is
+only true for one of the three presets. The demo declares a different total range for each
+preset. Compared against the real private project's own published figure, the first
+preset's range matches it exactly; the other two presets' ranges do \emph{not}. They extend
+past the real figure at both the low and the high end. They are fabricated variations,
+displayed under a caption asserting that they are the real published number.
+
+\begin{honest}{The defect, stated plainly}
+The page labels its fabricated content scrupulously and its \emph{real} content
+scrupulously, and then, in one place, labels fabricated content as real. Two of the three
+cost ranges are invented but captioned as ``the real, published per-post cost.''
+
+The demo's own README compounds this by describing the headline figure as ``anchored to the
+real, already-published production cost range from the source project's README.'' The range
+the README quotes is the spread across the demo's three presets, not the source project's
+published range. It reads as a citation and is not one.
+
+This is fixable in minutes and should be fixed before anyone is shown the page: either set
+all three presets to the real published range, or change the caption to say the totals are
+illustrative too. The former is better, since a single honest number is worth more than
+three plausible ones. The owner should note that this is exactly the failure the rest of
+the project is built to prevent, which is worth saying first in an interview rather than
+being caught by it.
+\end{honest}
+
+\subsection{One preset's own arithmetic does not close}
+
+A smaller, related problem, found by adding up what is on screen. The third preset's
+per-step line items sum to \$0.422, which is above the \$0.42 upper bound of the total it
+prints directly underneath them. The other two presets' rows do sum to inside their stated
+ranges. A reader with a calculator finds a table that contradicts its own total by two
+tenths of a cent. The ``illustrative'' caption technically covers it, but it is careless,
+and it undermines the table's only job, which is to look like a real accounting.
+
+\subsection{The grid is destroyed and rebuilt every second, for fifteen minutes}
+
+\code{addToLibrary} puts a one-second \code{setInterval} on \code{renderLibrary}, so that
+the countdown ribbon ticks. But \code{renderLibrary} does not update the ribbon. It
+rebuilds everything:
+
+\begin{lstlisting}
+function renderLibrary() {
+  const grid = document.getElementById("library-grid");
+  let html = "";
+  if (libraryDemo) { html += demoPostCard(); ... }
+  html += REAL_DAVONEX_POSTS.map(realPostCard).join("");
+  grid.innerHTML = html;   // <- destroys and recreates all 16 cards, every tick
+  ...
+}
+\end{lstlisting}
+
+This was measured, not inferred. A mutation observer on the grid recorded \textbf{4
+childList mutations in 4 seconds} while a demo card was live, and \textbf{0 in 4 seconds}
+when none was. Each rebuild recreates all 16 cards and all 16 \code{<img>} elements. Over a
+full fifteen-minute lifetime that is roughly 900 full teardowns of a grid that changed by
+five characters.
+
+\begin{honest}{This is not merely inefficient, it is observable}
+While writing this document, an attempt to click a library card through the browser
+automation failed outright with ``Node is detached from document.'' The card had been
+destroyed by the interval between being located and being clicked.
+
+Real users mostly escape this by luck of implementation: the click handler is bound to the
+grid container rather than to the cards, so \emph{clicks} survive the churn. What does not
+survive is anything the browser keeps on the element itself. A user cannot select or copy
+text from a card while the countdown runs, because the selection is wiped once a second.
+Hover transitions restart. On a low-end phone this is a needless 15-minute repaint loop.
+
+The fix is small: give the ribbon its own element and have the interval write only its text,
+or, better, recompute the countdown only while the library panel is actually visible. As
+written, the timer keeps rebuilding a hidden grid the entire time the reader panel is open,
+which was also confirmed in the browser.
+\end{honest}
+
+\subsection{No tab looks selected while reading an article}
+
+The tab bar has two buttons, \code{pipeline} and \code{library}. The reader is a third
+panel, \code{panel-reader}, with no corresponding button. \code{switchTab("reader")} does
+this:
+
+\begin{lstlisting}
+document.querySelectorAll(".tab").forEach(t =>
+  t.classList.toggle("is-active", t.dataset.tab === tabId));
+\end{lstlisting}
+
+With \code{tabId} of \code{"reader"}, no button matches, so both buttons lose their active
+state. Confirmed in the browser: while reading a post, the number of tabs marked active is
+zero. The user is on a page whose navigation claims they are nowhere. Minor and cosmetic,
+but it is a state the tab component was never designed to represent, and the reader panel
+was bolted on afterwards without extending it.
+
+\subsection{\code{escapeHtml} does not escape quotes, and is used inside attributes}
+
+The function handles \code{\&}, \code{<} and \code{>} but not \code{"} or \code{'}. Its
+output is then interpolated into attribute positions:
+
+\begin{lstlisting}
+<img src="${post.image}" alt="${escapeHtml(post.title)}" loading="lazy">
+\end{lstlisting}
+
+A title containing a double quote would break out of the \code{alt} attribute. Today this
+cannot be exploited: every string comes from a hand-written constant in the repository, and
+no user input reaches any renderer. So it is not a live vulnerability. It is a guard that
+looks complete and is not, in a file where the next person to add a field will reasonably
+assume it is. Note also that \code{post.image} and \code{s.url} are interpolated into
+\code{src} and \code{href} with no escaping at all.
+
+\subsection{The same data renders two different ways}
+
+One renderer prints reference numbers explicitly, as \code{[1]} and \code{[2]}, taken from
+each source's \code{ref} field. The other, which shows the same sources a few hundred pixels
+lower inside the publish preview, drops \code{ref} entirely and lets an ordered list number
+them by itself. If the two ever disagreed, the step-4 view and the step-7 preview would cite
+the same article under different numbers. They agree today only because the \code{ref} values
+happen to run 1, 2 in order.
+
+\subsection{The articles claim citations they do not contain}
+
+The README describes the Writer step as producing ``numbered citations with a References
+list,'' and lists ``numbered citations'' among the structural features deliberately matched
+to the real system's prompt templates. The reference lists are real and numbered. The
+inline citations are not there.
+
+Searching all three fabricated articles' intro paragraphs and section bodies for a citation
+marker of the form \code{[1]} returns \textbf{zero matches} in all three. The prose cites
+nothing; a numbered list of sources simply appears at the end. This matters more than it
+looks: the whole editorial argument for AEO content is that claims are attributable, and
+the demo's articles assert statistics and recommendations with no marker tying any of them
+to the two sources listed below. The \code{ref} field exists in the data and is rendered
+only in the list, never anchored in the text.
+
+\subsection{Smaller notes}
+
+\begin{itemize}
+  \item \textbf{Every fabricated source is a placeholder.} All six \code{sources} entries
+    across the three runs point at \code{example.com}. That is the honest choice (inventing
+    plausible real URLs would be worse) but it does mean the References lists, unlike the
+    real posts' lists, lead nowhere.
+  \item \textbf{Cards are not keyboard accessible.} A real post card is an \code{<article>}
+    with a \code{data-open-post} attribute, opened by a delegated click. It has no
+    \code{tabindex} and is not a button, so it cannot be reached or activated by keyboard.
+    The demo card, which uses real \code{<a>} elements, can be. The seven rail dots are
+    likewise plain \code{<div>}s.
+  \item \textbf{An \code{aria-hidden} wrapper around a captioned image.} The demo card's
+    image container is marked \code{aria-hidden="true"} while the \code{<img>} inside it
+    carries a real \code{alt} description, which is then hidden from screen readers anyway.
+  \item \textbf{One real post has an empty references array.} Handled correctly: the reader
+    checks the length and omits the section rather than printing an empty heading.
+  \item \textbf{\code{netlify.toml} is two lines} and says only ``publish this folder.''
+    That is the correct amount of configuration for a site with no build step, and is worth
+    noticing as a decision rather than an omission.
+  \item \textbf{The page is marked \code{noindex}}, so search engines are told not to list
+    it. Given that it reproduces a real client's articles verbatim, this is a deliberate
+    and correct choice: it avoids competing with the client's own pages for the very search
+    rankings the real pipeline exists to win.
+\end{itemize}
+
+\section{What this demo cannot demonstrate}
+
+An interviewer's fair question is ``what does clicking this actually prove?'' The honest
+answer is: less than it appears, and the gap should be volunteered rather than defended.
+
+\begin{figure}[H]
+\centering
+\resizebox{0.98\textwidth}{!}{
+\begin{tikzpicture}[node distance=6mm]
+  \node[box, fill=okgreen!10, draw=okgreen, text width=60mm, minimum height=42mm, align=left] (can)
+    {\textbf{What it does show}\\[4pt]
+     \footnotesize $\bullet$ The real architecture's stage list,\\ \quad order, and model tiering (verified)\\[2pt]
+     $\bullet$ What data each stage passes on\\[2pt]
+     $\bullet$ The shape of the finished article\\[2pt]
+     $\bullet$ That the real system publishes:\\ \quad 15 genuine posts, links intact\\[2pt]
+     $\bullet$ Front-end craft: layout, disclosure\\ \quad design, licensing discipline\\[2pt]
+     $\bullet$ Judgment about what may be shown};
+  \node[box, fill=warnred!10, draw=warnred, text width=60mm, minimum height=42mm, align=left, right=10mm of can] (cannot)
+    {\textbf{What it cannot show}\\[4pt]
+     \footnotesize $\bullet$ Any prompt, or any prompt engineering\\[2pt]
+     $\bullet$ That the pipeline works at all\\ \quad (nothing is executed)\\[2pt]
+     $\bullet$ Output \emph{quality}: the articles were\\ \quad hand-written to look good\\[2pt]
+     $\bullet$ Failure handling: no error path exists\\[2pt]
+     $\bullet$ Latency: the 900 ms per step is a\\ \quad UI pause, not a measurement\\[2pt]
+     $\bullet$ Cost measurement: the numbers are\\ \quad typed in, and two are wrong\\[2pt]
+     $\bullet$ Any backend skill whatsoever};
+  \draw[flow, <->] (can) -- (cannot);
+\end{tikzpicture}}
+\caption{The boundary of the evidence. Everything on the right is a real part of the real
+system that this repository is structurally incapable of demonstrating.}
+\end{figure}
+
+\begin{honest}{The trap to avoid in an interview}
+The single worst thing that could be said about this page is: ``here is my AI pipeline
+running.'' It is not running, and a sharp interviewer will find that out in one question,
+at which point every other claim becomes suspect.
+
+The strong version of the same sentence is: ``the real system is private, so I built an
+honest replica of its architecture and put it next to fifteen posts the real system
+actually published. The runs are fabricated and labelled as such. Here is what it proves
+and here is what it cannot.'' That framing turns the demo's greatest weakness, that it is
+fake, into evidence of the judgment that produced it.
+
+The cost-caption defect in Section~\ref{sec:honest} should be fixed before that
+conversation happens, because it is the one place where the page's own discipline slips,
+and it slips in the exact direction the interviewer will be probing.
+\end{honest}
+
+\section{Licensing and content provenance}
+
+Three licences apply to one folder, which the repository handles correctly and unusually
+carefully.
+
+\begin{center}
+\begin{tabular}{@{}p{40mm}p{40mm}p{62mm}@{}}
+\toprule
+\textbf{Content} & \textbf{Licence} & \textbf{Note} \\
+\midrule
+The repository's own code and fabricated content & PolyForm Strict 1.0.0 & Read it, do not
+reuse it. Appropriate for a portfolio piece. \\
+\file{coffee-beans.webp} & Public domain & Credited anyway. \\
+\file{espresso-machine.webp} & CC BY 2.0 & Author credited, crop disclosed. \\
+\file{coffee-cherries.webp} & CC BY-SA 4.0 & \textbf{Share-alike}: \file{CREDITS.md}
+explicitly records that this one file stays CC BY-SA and does \emph{not} fall under the
+repository's PolyForm licence. \\
+The 15 real posts and images & The client's & Not open-licensed at all. Reproduced with a
+provenance link on every article and a \file{CREDITS.md} explaining why. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{keyidea}{The share-alike catch, spotted}
+CC BY-SA is ``viral'': a work derived from it must carry the same licence. A cropped photo
+is a derivative. Dropping that photo into a strictly licensed repository without comment
+would have quietly violated its terms. \file{assets/images/CREDITS.md} carves it out by
+name. Most portfolio projects do not notice this. This one did, and can say so.
+\end{keyidea}
+
+\begin{jargon}{PolyForm Strict}
+A licence that lets anyone read the source and use the software unmodified for
+noncommercial evaluation, while reserving essentially every other right. It is the standard
+choice for showing work publicly without granting a licence to reuse it.
+\end{jargon}
+
+\section{The design layer}
+
+\file{styles.css} is 454 lines and its own honesty case. Its opening comment states that
+the palette, radii, shadows and the entire article template were copied from the real
+client's live public CSS and a real published page, on the reasoning that this is the
+visual design language every visitor's browser already renders, as distinct from the
+site's private server code, which is not in this repository.
+
+The line the file draws is worth noting: the layout patterns are reused, but the demo's
+outer shell uses the invented ``Nordkast Coffee Supply'' mark, not the real client's logo
+or name, specifically to avoid impersonating the client's site. So the publish preview
+looks exactly like a real article on the real template, while being unmistakably branded to
+a company that does not exist.
+
+The banner's styling carries an explicit comment that it is ``deliberately not brand-blue''
+so that the disclosure never reads as decoration. That is a small choice that shows the
+disclosure was designed rather than added.
+
+\begin{jargon}{Design tokens}
+Named values for the raw ingredients of a design: \code{--blue: \#136BEE}, \code{--r-lg:
+26px}. Defining them once and referring to them by name everywhere means the design stays
+consistent and can be re-themed by editing a dozen lines. The convention here is CSS
+custom properties declared on \code{:root}.
+\end{jargon}
+
+\section{Summary}
+
+\begin{keyidea}{The verdict}
+As a piece of engineering this is a small, clean, dependency-free static page: about 1,700
+lines of hand-written code, no build step, no framework, no network, no errors. That is
+appropriate. Nothing here needed to be harder.
+
+As a piece of \emph{judgment} it is more interesting than its size suggests. The provenance
+ladder, the licence carve-out, the refusal to hotlink, the \code{noindex}, and the decision
+to show real client work next to fabricated work rather than fake the whole library are all
+deliberate and defensible choices about what may honestly be shown.
+
+Its architectural claim about the private system is accurate, and that was verified
+independently rather than taken on trust. Its cost claim is not accurate for two of three
+presets, which is a real defect in precisely the dimension the project stakes itself on,
+and it should be fixed before the page is shown to anyone.
+\end{keyidea}
+
+\vfill
+\begin{center}\footnotesize\itshape
+Every finding in this document was taken from the source, or from driving the page in a
+real browser. Claims about the private \file{blog-posting-pipeline} were checked against
+that project's own documentation; none of its private detail is reproduced here.
+\end{center}
+
+\end{document}
